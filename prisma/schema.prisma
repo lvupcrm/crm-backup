@@ -1,0 +1,149 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password      String
+  name          String
+  phone         String?
+  branchId      String?
+  branch        Branch?   @relation(fields: [branchId], references: [id])
+  roleId        String
+  role          Role      @relation(fields: [roleId], references: [id])
+  createdAt     DateTime  @default(now())
+  
+  consultationCustomers ConsultationCustomer[] @relation("Manager")
+  registeredCustomers   RegisteredCustomer[]   @relation("Trainer")
+  branches              Branch[]               @relation("BranchManager")
+}
+
+model Role {
+  id            String    @id @default(uuid())
+  name          String
+  permissions   Json
+  createdAt     DateTime  @default(now())
+  
+  users         User[]
+}
+
+model Branch {
+  id            String    @id @default(uuid())
+  name          String
+  address       String
+  phone         String
+  managerId     String?
+  manager       User?     @relation("BranchManager", fields: [managerId], references: [id])
+  createdAt     DateTime  @default(now())
+  
+  users         User[]
+  products      Product[]
+  registeredCustomers RegisteredCustomer[]
+}
+
+model ConsultationCustomer {
+  id                  String    @id @default(uuid())
+  name                String
+  phone               String    @unique
+  appointmentDate     DateTime
+  inquiryChannel      String
+  sport               String
+  appointmentPurpose  String    // 상담 / 체험 / 기타
+  consultationStatus  String    // 미상담 / 상담완료
+  managerId           String?
+  manager             User?     @relation("Manager", fields: [managerId], references: [id])
+  registrationStatus  String    // 미등록 / 등록완료
+  memo                String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
+
+model RegisteredCustomer {
+  id                String    @id @default(uuid())
+  name              String
+  phone             String    @unique
+  joinDate          DateTime
+  membershipType    String
+  membershipExpiry  DateTime
+  trainerId         String?
+  trainer           User?     @relation("Trainer", fields: [trainerId], references: [id])
+  branchId          String
+  branch            Branch    @relation(fields: [branchId], references: [id])
+  status            String    // 활동 / 만료 / 휴면
+  memo              String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  payments          Payment[]
+}
+
+model Product {
+  id              String    @id @default(uuid())
+  productName     String
+  description     String?
+  price           Int
+  validityPeriod  Int       // 일 단위
+  branchId        String?
+  branch          Branch?   @relation(fields: [branchId], references: [id])
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  payments        Payment[]
+}
+
+model Payment {
+  id              String    @id @default(uuid())
+  customerId      String
+  customer        RegisteredCustomer @relation(fields: [customerId], references: [id])
+  productId       String
+  product         Product   @relation(fields: [productId], references: [id])
+  amount          Int
+  paymentMethod   String
+  paymentDate     DateTime
+  memo            String?
+  createdAt       DateTime  @default(now())
+}
+
+model MessageTemplate {
+  id              String    @id @default(uuid())
+  templateName    String
+  channel         String    // 알림톡 / SMS
+  templateCode    String?
+  content         String
+  variables       Json      // ["{{이름}}", "{{날짜}}"]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  campaigns       Campaign[]
+  scheduledMessages ScheduledMessage[]
+}
+
+model Campaign {
+  id              String    @id @default(uuid())
+  campaignName    String
+  description     String?
+  sendCondition   String
+  templateId      String
+  template        MessageTemplate @relation(fields: [templateId], references: [id])
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model ScheduledMessage {
+  id              String    @id @default(uuid())
+  recipientPhone  String
+  templateId      String
+  template        MessageTemplate @relation(fields: [templateId], references: [id])
+  scheduledAt     DateTime
+  sendStatus      String    // 대기 / 성공 / 실패
+  resultMessage   String?
+  createdAt       DateTime  @default(now())
+}
