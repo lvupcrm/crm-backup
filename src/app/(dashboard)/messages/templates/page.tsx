@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Edit2, Trash2, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const CHANNELS = [
   { value: "alimtalk", label: "알림톡 템플릿" },
@@ -74,6 +75,7 @@ function TemplateTypeSelector({ value, onChange }: { value: string; onChange: (v
 }
 
 export default function TemplateListPage() {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [channelTab, setChannelTab] = useState("alimtalk");
@@ -114,23 +116,11 @@ export default function TemplateListPage() {
     <div className="min-h-screen bg-[#f7f9fb] px-2 sm:px-6 md:px-10 py-4">
       <div className="mb-6">
         <h1 className="text-xl font-extrabold text-gray-900 mb-4 text-center tracking-tight">템플릿 목록</h1>
-        <Tabs value={channelTab} onValueChange={setChannelTab} className="mb-6">
+        {/* 상단 탭 */}
+        <Tabs defaultValue="approved" className="mb-6">
           <TabsList className="w-full flex gap-4 justify-center bg-transparent mb-3">
-            {CHANNELS.map((c) => (
-              <TabsTrigger
-                key={c.value}
-                value={c.value}
-                className={`flex-1 min-w-[180px] max-w-xs h-10 px-4 rounded-full text-base font-bold transition-all
-                  border-2
-                  ${channelTab === c.value
-                    ? 'bg-white border-blue-400 text-blue-700 shadow-md'
-                    : 'bg-gray-100 border-gray-200 text-gray-400'}
-                `}
-                style={{ boxShadow: channelTab === c.value ? '0 2px 12px rgba(0,0,0,0.06)' : undefined }}
-              >
-                {c.label}
-              </TabsTrigger>
-            ))}
+            <TabsTrigger value="requests" onClick={() => router.push("/messages/templates/requests")}>신청목록</TabsTrigger>
+            <TabsTrigger value="approved">승인된 템플릿</TabsTrigger>
           </TabsList>
         </Tabs>
         {channelTab === "alimtalk" && (
