@@ -120,7 +120,7 @@ model MessageTemplate {
   variables       Json      // ["{{이름}}", "{{날짜}}"]
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-  
+  status          String    // 승인대기, 승인완료, 반려 등 템플릿 승인 상태
   campaigns       Campaign[]
   scheduledMessages ScheduledMessage[]
 }
