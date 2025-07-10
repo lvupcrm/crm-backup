@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import React, { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useMutation } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { api } from '@/lib/api/client'
-import { MessageTemplate } from '@/lib/types'
 import { format } from 'date-fns';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -45,6 +44,37 @@ function KakaoPreviewCard({
         <div className="text-xs text-gray-500 whitespace-pre-line mb-2">{format(date, 'yyyy년 MM월 dd일')} 오전 12:14</div>
         <div className="flex flex-col gap-2 mt-2">
           <button className="w-full rounded bg-[#ffe812] text-gray-900 font-bold py-1.5 text-sm border border-[#ffe812] hover:bg-yellow-300 transition" style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}>채널 추가</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FriendTalkPreviewCard({
+  content,
+  type,
+  date,
+}: {
+  content: string;
+  type: string;
+  date: Date;
+}) {
+  return (
+    <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-md w-full mx-auto mb-4" style={{ border: '1.5px solid #e5e7eb', minHeight: 180 }}>
+      <div className="flex items-center justify-between px-4 py-2" style={{ background: '#fee500' }}>
+        <span className="text-xs font-bold text-gray-700 tracking-wide">친구톡</span>
+        <div style={{
+          background: '#222', color: '#fff', borderRadius: '50%', width: 32, height: 32,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 14, letterSpacing: '-1px', border: '2px solid #fff', boxShadow: '0 1px 2px rgba(0,0,0,0.08)'
+        }}>kakao</div>
+      </div>
+      <div className="flex-1 flex flex-col bg-white px-5 py-4">
+        <div className="text-base font-bold text-gray-900 mb-2" style={{ lineHeight: 1.2 }}>친구톡 메시지</div>
+        <div className="text-xs text-gray-700 whitespace-pre-line mb-3">{content || '메시지 내용을 입력하세요'}</div>
+        <div className="border-t border-gray-200 my-2" />
+        <div className="text-xs text-gray-500 whitespace-pre-line mb-2">{format(date, 'yyyy년 MM월 dd일')} 오전 12:14</div>
+        <div className="flex flex-col gap-2 mt-2">
+          <button className="w-full rounded bg-[#fee500] text-gray-900 font-bold py-1.5 text-sm border border-[#fee500] hover:bg-yellow-400 transition" style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}>채널 추가</button>
         </div>
       </div>
     </div>
@@ -101,8 +131,106 @@ const BUTTON_TYPES = [
   '채널추가', '웹링크', '앱링크 (URL Scheme)', '배송조회', '봇키워드', '메시지전달', '상담톡전환', '봇전환'
 ];
 
+function TemplateTypeSelector({ value, onChange, types }: { value: string; onChange: (v: string) => void; types: any[] }) {
+  function renderTypeIcon(type: any) {
+    switch (type.value) {
+      case 'text':
+        return (
+          <div className="flex flex-col items-center mt-1">
+            <div className="h-2 w-8 rounded bg-yellow-300 mx-auto mb-1" />
+            <div className="h-2 w-6 rounded bg-gray-300 mx-auto mb-0.5" />
+            <div className="h-2 w-8 rounded bg-gray-300 mx-auto mt-1" />
+          </div>
+        );
+      case 'image':
+        return (
+          <div className="flex flex-col items-center mt-1">
+            <div className="h-2 w-8 rounded bg-yellow-300 mx-auto mb-1" />
+            <div className="h-2 w-6 rounded bg-gray-300 mx-auto mb-0.5" />
+            <div className="w-8 h-5 bg-blue-100 rounded flex items-center justify-center mt-1"><span className="text-blue-500 text-lg">🖼️</span></div>
+          </div>
+        );
+      case 'wide_image':
+        return (
+          <div className="flex flex-col items-center mt-1">
+            <div className="h-2 w-8 rounded bg-yellow-300 mx-auto mb-1" />
+            <div className="h-2 w-6 rounded bg-gray-300 mx-auto mb-0.5" />
+            <div className="h-3 w-12 rounded bg-blue-200 mx-auto mt-1" />
+          </div>
+        );
+      case 'wide_list':
+        return (
+          <div className="flex flex-col items-center mt-1">
+            <div className="h-2 w-8 rounded bg-yellow-300 mx-auto mb-1" />
+            <div className="h-2 w-6 rounded bg-gray-300 mx-auto mb-0.5" />
+            <div className="flex flex-col gap-0.5 mt-1">
+              <div className="h-1 w-10 bg-gray-300 rounded mx-auto" />
+              <div className="h-1 w-10 bg-gray-300 rounded mx-auto" />
+              <div className="h-1 w-10 bg-gray-300 rounded mx-auto" />
+            </div>
+          </div>
+        );
+      case 'carousel':
+        return (
+          <div className="flex flex-col items-center mt-1">
+            <div className="h-2 w-8 rounded bg-yellow-300 mx-auto mb-1" />
+            <div className="h-2 w-6 rounded bg-gray-300 mx-auto mb-0.5" />
+            <div className="flex flex-row gap-1 mt-1">
+              <div className="w-3 h-5 bg-gray-200 rounded" />
+              <div className="w-3 h-5 bg-gray-300 rounded" />
+              <div className="w-3 h-5 bg-gray-400 rounded" />
+            </div>
+          </div>
+        );
+      default:
+        // alimtalk types
+        return (
+          <div className="w-full">
+            <div className="h-2 w-8 rounded bg-yellow-300 mx-auto mb-1" />
+            <div className="h-2 w-6 rounded bg-gray-300 mx-auto mb-0.5" />
+            {type.value === 'image' && <div className="flex justify-end"><span className="inline-block w-4 h-4 bg-blue-100 text-blue-500 text-xs rounded-full flex items-center justify-center">📷</span></div>}
+            {type.value === 'list' && <div className="flex flex-col gap-0.5 mt-1"><div className="h-1 w-6 bg-gray-300 rounded mx-auto" /><div className="h-1 w-6 bg-gray-300 rounded mx-auto" /></div>}
+          </div>
+        );
+    }
+  }
+  return (
+    <div className="mb-4">
+      <div className="font-bold text-base mb-2 text-center mx-auto w-full" style={{maxWidth:'max-content'}}>
+        템플릿 유형
+      </div>
+      <div className={`grid ${types.length > 4 ? 'grid-cols-2 sm:grid-cols-5' : 'grid-cols-2 sm:grid-cols-4'} gap-3 max-w-3xl mx-auto`}>
+        {types.map((type) => {
+          const selected = value === type.value;
+          return (
+            <button
+              key={type.value}
+              type="button"
+              onClick={() => onChange(type.value)}
+              className={`relative flex flex-col items-center justify-center rounded-2xl border bg-gray-50 px-2 py-3 shadow-lg transition-all
+                ${selected ? 'border-blue-500 ring-2 ring-blue-200 bg-white' : 'border-gray-200 hover:border-blue-300'}
+              `}
+              style={{ minHeight: 80 }}
+            >
+              <div className="w-10 h-6 mb-1 flex items-center justify-center">
+                {renderTypeIcon(type)}
+              </div>
+              <span className={`mt-1 text-sm font-bold ${selected ? 'text-blue-600' : 'text-gray-700'}`}>{type.label}</span>
+              <span className={`absolute top-1 right-1 w-4 h-4 rounded-full border-2 flex items-center justify-center ${selected ? 'border-pink-500 bg-white' : 'border-gray-300 bg-white'}`}>
+                {selected && <span className="w-2 h-2 rounded-full bg-pink-500 block" />}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function CreateTemplatePage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const [channelTab, setChannelTab] = useState<'alimtalk' | 'friendtalk'>('alimtalk');
   const [formData, setFormData] = useState({
     templateName: '',
     channel: '알림톡',
@@ -121,12 +249,36 @@ export default function CreateTemplatePage() {
   const [newButton, setNewButton] = useState({ type: '', name: '', link: '' });
   const [checklist, setChecklist] = useState(false);
 
+  // URL 파라미터에서 예시 데이터 로드
+  useEffect(() => {
+    const name = searchParams.get('name');
+    const content = searchParams.get('content');
+    const channel = searchParams.get('channel');
+    const type = searchParams.get('type');
+    const variables = searchParams.get('variables');
+
+    if (name || content || channel || type) {
+      setFormData(prev => ({
+        ...prev,
+        templateName: name || prev.templateName,
+        content: content || prev.content,
+        channel: channel || prev.channel,
+        type: type || prev.type,
+      }));
+      if (channel === '알림톡') setChannelTab('alimtalk');
+      if (channel === '친구톡') setChannelTab('friendtalk');
+      if (type) {
+        setTypeTab(type);
+      }
+    }
+  }, [searchParams]);
+
   // 변수 추출
   const variables = (formData.content.match(/{{[^}]+}}/g) || []);
   const uniqueVariables = [...new Set(variables)];
 
   const createMutation = useMutation({
-    mutationFn: (data: any) => api.createMessageTemplate(data),
+    mutationFn: (data: any) => api.createTemplate(data),
     onSuccess: () => {
       router.push('/messages/templates')
     },
@@ -144,8 +296,41 @@ export default function CreateTemplatePage() {
     })
   }
 
+  const FRIENDTALK_TEMPLATE_TYPES = [
+    { value: "text", label: "텍스트형", icon: null },
+    { value: "image", label: "이미지형", icon: null },
+    { value: "wide_image", label: "와이드 이미지형", icon: null },
+    { value: "wide_list", label: "와이드 아이템 리스트형", icon: null },
+    { value: "carousel", label: "캐러셀 피드형", icon: null },
+  ];
+
+  const typeOptions = channelTab === "alimtalk" ? TEMPLATE_TYPES : FRIENDTALK_TEMPLATE_TYPES;
+
   return (
     <div className="max-w-4xl mx-auto px-0 py-4 sm:px-0 md:px-0 md:py-6">
+      {/* 상단 탭: 알림톡 만들기/친구톡 만들기 */}
+      <div className="flex justify-center mb-8">
+        <div className="flex gap-4 w-full max-w-2xl justify-center">
+          <button
+            type="button"
+            onClick={() => { setChannelTab('alimtalk'); setFormData(f => ({ ...f, channel: '알림톡' })); }}
+            className={`flex-1 min-w-[180px] max-w-xs h-10 px-4 rounded-full text-base font-bold transition-all border-2
+              ${channelTab === 'alimtalk' ? 'bg-white border-blue-400 text-blue-700 shadow-md' : 'bg-gray-100 border-gray-200 text-gray-400'}
+            `}
+          >
+            알림톡 만들기
+          </button>
+          <button
+            type="button"
+            onClick={() => { setChannelTab('friendtalk'); setFormData(f => ({ ...f, channel: '친구톡' })); }}
+            className={`flex-1 min-w-[180px] max-w-xs h-10 px-4 rounded-full text-base font-bold transition-all border-2
+              ${channelTab === 'friendtalk' ? 'bg-white border-blue-400 text-blue-700 shadow-md' : 'bg-gray-100 border-gray-200 text-gray-400'}
+            `}
+          >
+            친구톡 만들기
+          </button>
+        </div>
+      </div>
       {/* 상단 안내/가이드 */}
       <div className="mb-8">
         <h1 className="text-2xl font-extrabold text-gray-900 mb-2">새 템플릿 등록하기</h1>
@@ -235,62 +420,122 @@ export default function CreateTemplatePage() {
                 </div>
               </CardContent>
             </Card>
+            {/* 친구톡 버튼 추가/삭제 */}
+            {channelTab === 'friendtalk' && (
+              <Card className="mb-3">
+                <CardHeader className="p-4 pb-2">
+                  <CardTitle>친구톡 버튼 (선택사항)</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 pt-2">
+                  {buttons.length === 0 && <div className="text-gray-400 mb-2">등록된 버튼이 없습니다.</div>}
+                  <div className="flex flex-col gap-2 mb-2">
+                    {buttons.map((btn, idx) => (
+                      <div key={idx} className="flex gap-2 items-center">
+                        <span className="text-sm font-semibold">{btn.name}</span>
+                        <span className="text-xs text-gray-500">{btn.type}</span>
+                        {btn.link && <span className="text-xs text-gray-400">{btn.link}</span>}
+                        <Button type="button" size="sm" variant="destructive" onClick={() => setButtons(buttons.filter((_, i) => i !== idx))}>삭제</Button>
+                      </div>
+                    ))}
+                  </div>
+                  {buttons.length < 5 && (
+                    <Button type="button" size="sm" variant="outline" onClick={() => setButtonDialogOpen(true)}>
+                      + 버튼 추가
+                    </Button>
+                  )}
+                  <Dialog open={buttonDialogOpen} onOpenChange={setButtonDialogOpen}>
+                    <DialogContent className="max-w-sm">
+                      <DialogHeader>
+                        <DialogTitle>새 버튼 추가</DialogTitle>
+                      </DialogHeader>
+                      <div className="mb-2">
+                        <Label>버튼 종류 선택</Label>
+                        <select className="w-full border rounded p-2" value={newButton.type} onChange={e => setNewButton({ ...newButton, type: e.target.value })}>
+                          <option value="">버튼 종류 선택</option>
+                          {BUTTON_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                        </select>
+                      </div>
+                      <div className="mb-2">
+                        <Label>버튼명</Label>
+                        <Input value={newButton.name} onChange={e => setNewButton({ ...newButton, name: e.target.value })} />
+                      </div>
+                      <div className="mb-2">
+                        <Label>링크 (선택)</Label>
+                        <Input value={newButton.link} onChange={e => setNewButton({ ...newButton, link: e.target.value })} />
+                      </div>
+                      <div className="flex justify-end gap-2 mt-2">
+                        <Button type="button" variant="outline" onClick={() => setButtonDialogOpen(false)}>취소</Button>
+                        <Button type="button" onClick={() => {
+                          if (newButton.type && newButton.name) {
+                            setButtons([...buttons, newButton]);
+                            setNewButton({ type: '', name: '', link: '' });
+                            setButtonDialogOpen(false);
+                          }
+                        }}>추가</Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </CardContent>
+              </Card>
+            )}
             {/* 알림톡 버튼 추가/삭제 */}
-            <Card className="mb-3">
-              <CardHeader className="p-4 pb-2">
-                <CardTitle>알림톡 버튼 (선택사항)</CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 pt-2">
-                {buttons.length === 0 && <div className="text-gray-400 mb-2">등록된 버튼이 없습니다.</div>}
-                <div className="flex flex-col gap-2 mb-2">
-                  {buttons.map((btn, idx) => (
-                    <div key={idx} className="flex gap-2 items-center">
-                      <span className="text-sm font-semibold">{btn.name}</span>
-                      <span className="text-xs text-gray-500">{btn.type}</span>
-                      {btn.link && <span className="text-xs text-gray-400">{btn.link}</span>}
-                      <Button type="button" size="sm" variant="destructive" onClick={() => setButtons(buttons.filter((_, i) => i !== idx))}>삭제</Button>
-                    </div>
-                  ))}
-                </div>
-                {buttons.length < 5 && (
-                  <Button type="button" size="sm" variant="outline" onClick={() => setButtonDialogOpen(true)}>
-                    + 버튼 추가
-                  </Button>
-                )}
-                <Dialog open={buttonDialogOpen} onOpenChange={setButtonDialogOpen}>
-                  <DialogContent className="max-w-sm">
-                    <DialogHeader>
-                      <DialogTitle>새 버튼 추가</DialogTitle>
-                    </DialogHeader>
-                    <div className="mb-2">
-                      <Label>버튼 종류 선택</Label>
-                      <select className="w-full border rounded p-2" value={newButton.type} onChange={e => setNewButton({ ...newButton, type: e.target.value })}>
-                        <option value="">버튼 종류 선택</option>
-                        {BUTTON_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                      </select>
-                    </div>
-                    <div className="mb-2">
-                      <Label>버튼명</Label>
-                      <Input value={newButton.name} onChange={e => setNewButton({ ...newButton, name: e.target.value })} />
-                    </div>
-                    <div className="mb-2">
-                      <Label>링크 (선택)</Label>
-                      <Input value={newButton.link} onChange={e => setNewButton({ ...newButton, link: e.target.value })} />
-                    </div>
-                    <div className="flex justify-end gap-2 mt-2">
-                      <Button type="button" variant="outline" onClick={() => setButtonDialogOpen(false)}>취소</Button>
-                      <Button type="button" onClick={() => {
-                        if (newButton.type && newButton.name) {
-                          setButtons([...buttons, newButton]);
-                          setNewButton({ type: '', name: '', link: '' });
-                          setButtonDialogOpen(false);
-                        }
-                      }}>추가</Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </CardContent>
-            </Card>
+            {channelTab === 'alimtalk' && (
+              <Card className="mb-3">
+                <CardHeader className="p-4 pb-2">
+                  <CardTitle>알림톡 버튼 (선택사항)</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 pt-2">
+                  {buttons.length === 0 && <div className="text-gray-400 mb-2">등록된 버튼이 없습니다.</div>}
+                  <div className="flex flex-col gap-2 mb-2">
+                    {buttons.map((btn, idx) => (
+                      <div key={idx} className="flex gap-2 items-center">
+                        <span className="text-sm font-semibold">{btn.name}</span>
+                        <span className="text-xs text-gray-500">{btn.type}</span>
+                        {btn.link && <span className="text-xs text-gray-400">{btn.link}</span>}
+                        <Button type="button" size="sm" variant="destructive" onClick={() => setButtons(buttons.filter((_, i) => i !== idx))}>삭제</Button>
+                      </div>
+                    ))}
+                  </div>
+                  {buttons.length < 5 && (
+                    <Button type="button" size="sm" variant="outline" onClick={() => setButtonDialogOpen(true)}>
+                      + 버튼 추가
+                    </Button>
+                  )}
+                  <Dialog open={buttonDialogOpen} onOpenChange={setButtonDialogOpen}>
+                    <DialogContent className="max-w-sm">
+                      <DialogHeader>
+                        <DialogTitle>새 버튼 추가</DialogTitle>
+                      </DialogHeader>
+                      <div className="mb-2">
+                        <Label>버튼 종류 선택</Label>
+                        <select className="w-full border rounded p-2" value={newButton.type} onChange={e => setNewButton({ ...newButton, type: e.target.value })}>
+                          <option value="">버튼 종류 선택</option>
+                          {BUTTON_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                        </select>
+                      </div>
+                      <div className="mb-2">
+                        <Label>버튼명</Label>
+                        <Input value={newButton.name} onChange={e => setNewButton({ ...newButton, name: e.target.value })} />
+                      </div>
+                      <div className="mb-2">
+                        <Label>링크 (선택)</Label>
+                        <Input value={newButton.link} onChange={e => setNewButton({ ...newButton, link: e.target.value })} />
+                      </div>
+                      <div className="flex justify-end gap-2 mt-2">
+                        <Button type="button" variant="outline" onClick={() => setButtonDialogOpen(false)}>취소</Button>
+                        <Button type="button" onClick={() => {
+                          if (newButton.type && newButton.name) {
+                            setButtons([...buttons, newButton]);
+                            setNewButton({ type: '', name: '', link: '' });
+                            setButtonDialogOpen(false);
+                          }
+                        }}>추가</Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </CardContent>
+              </Card>
+            )}
             {/* 사용 변수 목록 */}
             <Card className="mb-3">
               <CardHeader className="p-4 pb-2">
@@ -322,7 +567,7 @@ export default function CreateTemplatePage() {
                   <li>앱 설치를 유도하는 문구 포함</li>
                 </ul>
                 <div className="flex items-center gap-2 mb-2">
-                  <Checkbox id="checklist" checked={checklist} onCheckedChange={setChecklist} />
+                  <Checkbox id="checklist" checked={checklist} onCheckedChange={(checked) => setChecklist(checked === true)} />
                   <Label htmlFor="checklist">모두 확인했으며 위 항목 해당 사항 없습니다.</Label>
                 </div>
               </CardContent>
@@ -343,46 +588,21 @@ export default function CreateTemplatePage() {
           </div>
           <div className="flex-1 min-w-0 flex flex-col items-center">
             {/* 템플릿 유형 2단 그리드 */}
-            <div className="w-full max-w-md mb-4">
-              <div className="font-bold text-base mb-2 text-center mx-auto w-full" style={{maxWidth:'max-content'}}>
-                템플릿 유형
-              </div>
-              <div className="grid grid-cols-2 gap-x-6 gap-y-4 w-full">
-                {TEMPLATE_TYPES.map((type) => {
-                  const selected = typeTab === type.value;
-                  return (
-                    <button
-                      key={type.value}
-                      type="button"
-                      onClick={() => { setTypeTab(type.value); setFormData({ ...formData, type: type.value }); }}
-                      className={`relative flex flex-col items-center justify-center rounded-2xl border bg-gray-50 px-6 py-6 shadow-lg transition-all
-                        ${selected ? 'border-blue-500 ring-2 ring-blue-200 bg-white' : 'border-gray-200 hover:border-blue-300'}
-                      `}
-                      style={{ minHeight: 110 }}
-                    >
-                      <div className="w-14 h-8 mb-2 flex items-center justify-center">
-                        <div className="w-full">
-                          <div className="h-2 w-10 rounded bg-yellow-300 mx-auto mb-1" />
-                          <div className="h-2 w-8 rounded bg-gray-300 mx-auto mb-0.5" />
-                          {type.value === 'image' && <div className="flex justify-end"><span className="inline-block w-5 h-5 bg-blue-100 text-blue-500 text-xs rounded-full flex items-center justify-center">📷</span></div>}
-                          {type.value === 'list' && <div className="flex flex-col gap-0.5 mt-1"><div className="h-1 w-7 bg-gray-300 rounded mx-auto" /><div className="h-1 w-7 bg-gray-300 rounded mx-auto" /></div>}
-                        </div>
-                      </div>
-                      <span className={`mt-1 text-lg font-bold ${selected ? 'text-blue-600' : 'text-gray-700'}`}>{type.label}</span>
-                      <span className={`absolute top-2 right-2 w-5 h-5 rounded-full border-2 flex items-center justify-center ${selected ? 'border-pink-500 bg-white' : 'border-gray-300 bg-white'}`}>
-                        {selected && <span className="w-3 h-3 rounded-full bg-pink-500 block" />}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-            <KakaoPreviewCard
-              channelName={formData.branch ? `@ ${BRANCHES.find(b => b.value === formData.branch)?.label}` : '채널명'}
-              content={formData.content}
-              type={typeTab}
-              date={new Date()}
-            />
+            <TemplateTypeSelector value={typeTab} onChange={setTypeTab} types={typeOptions} />
+            {channelTab === 'alimtalk' ? (
+              <KakaoPreviewCard
+                channelName={formData.branch ? `@ ${BRANCHES.find(b => b.value === formData.branch)?.label}` : '채널명'}
+                content={formData.content}
+                type={typeTab}
+                date={new Date()}
+              />
+            ) : (
+              <FriendTalkPreviewCard
+                content={formData.content}
+                type={typeTab}
+                date={new Date()}
+              />
+            )}
             <div className="text-center text-gray-400 text-sm mt-2">미리보기는 실제 단말기와 차이가 있을 수 있습니다.</div>
           </div>
         </div>

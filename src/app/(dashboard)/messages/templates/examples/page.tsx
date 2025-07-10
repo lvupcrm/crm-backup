@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +23,14 @@ const TEMPLATE_TYPES = [
   { value: "emphasis", label: "강조표기형", icon: null },
   { value: "image", label: "이미지첨부형", icon: null },
   { value: "list", label: "리스트형", icon: null },
+];
+
+const FRIENDTALK_TEMPLATE_TYPES = [
+  { value: "text", label: "텍스트형", icon: null },
+  { value: "image", label: "이미지형", icon: null },
+  { value: "wide_image", label: "와이드 이미지형", icon: null },
+  { value: "wide_list", label: "와이드 아이템 리스트형", icon: null },
+  { value: "carousel", label: "캐러셀 피드형", icon: null },
 ];
 
 type Example = {
@@ -55,10 +64,11 @@ const EXAMPLES: ExampleData = {
   },
   friendtalk: {
     new: [
-      { id: 7, name: "친구톡 신규 안내", channel: "친구톡", content: `#\u007B고객명\u007D 회원님,\n스테이피트니스 친구톡 신규 안내입니다!\n\n친구톡으로 다양한 소식을 받아보세요.\n\n💬 문의사항은 언제든 연락주세요.\n\n채널 추가하고 이 채널의 광고와 마케팅 메시지를 카카오톡으로 받기`, variables: ["고객명"], type: "basic" },
-      { id: 8, name: "강조 안내", channel: "친구톡", content: `중요 안내\n\n[이름]님, 꼭 확인해주세요!`, variables: ["이름"], type: "emphasis" },
-      { id: 9, name: "이미지 안내", channel: "친구톡", content: `이미지 첨부 예시\n\n[이름]님, 이미지를 확인하세요.`, variables: ["이름"], type: "image" },
-      { id: 10, name: "리스트 안내", channel: "친구톡", content: `리스트 안내\n\n- 항목1\n- 항목2\n- 항목3`, variables: [], type: "list" },
+      { id: 7, name: "친구톡 텍스트형 예시", channel: "친구톡", content: "텍스트형 예시 메시지입니다.", variables: [], type: "text" },
+      { id: 8, name: "친구톡 이미지형 예시", channel: "친구톡", content: "이미지형 예시 메시지입니다.", variables: [], type: "image" },
+      { id: 9, name: "친구톡 와이드 이미지형 예시", channel: "친구톡", content: "와이드 이미지형 예시 메시지입니다.", variables: [], type: "wide_image" },
+      { id: 10, name: "친구톡 와이드 아이템 리스트형 예시", channel: "친구톡", content: "와이드 아이템 리스트형 예시 메시지입니다.", variables: [], type: "wide_list" },
+      { id: 11, name: "친구톡 캐러셀 피드형 예시", channel: "친구톡", content: "캐러셀 피드형 예시 메시지입니다.", variables: [], type: "carousel" },
     ],
     remind: [
       { id: 11, name: "친구톡 리마인드", channel: "친구톡", content: "[이름]님, 친구톡 리마인드 메시지입니다.", variables: ["이름"], type: "basic" },
@@ -93,12 +103,39 @@ function KakaoLogo({ channel }: { channel: string }) {
 }
 
 function KakaoStyleCard({ ex }: { ex: Example }) {
+  const router = useRouter();
   const lines = ex.content.split('\n');
   const title = lines[0];
   const subtitle = lines[1];
   const body = lines.slice(2, lines.length - 2).join('\n');
   const footer = lines.slice(-2).join('\n');
   const topBarText = ex.channel === "알림톡" ? "알림톡 도착" : "친구톡 도착";
+
+  const handleModify = () => {
+    // URL 파라미터로 예시 데이터 전달
+    const params = new URLSearchParams({
+      name: ex.name,
+      content: ex.content,
+      channel: ex.channel,
+      type: ex.type,
+      variables: ex.variables.join(','),
+    });
+    router.push(`/messages/templates/create?${params.toString()}`);
+  };
+
+  const handleApply = () => {
+    // 신청 페이지로 이동 (템플릿 신청 목록 페이지)
+    const params = new URLSearchParams({
+      name: ex.name,
+      content: ex.content,
+      channel: ex.channel,
+      type: ex.type,
+      variables: ex.variables.join(','),
+      fromExample: 'true',
+    });
+    router.push(`/messages/templates/requests?${params.toString()}`);
+  };
+
   return (
     <div
       className="rounded-2xl shadow-xl overflow-hidden bg-[#e5efff] flex flex-col h-full transition-transform hover:scale-[1.03]"
@@ -127,6 +164,20 @@ function KakaoStyleCard({ ex }: { ex: Example }) {
           >
             {ex.channel === "알림톡" ? "리뷰 작성하기" : "메시지 확인하기"}
           </button>
+          <div className="flex gap-2">
+            <Button
+              onClick={handleModify}
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1.5 text-sm"
+            >
+              수정
+            </Button>
+            <Button
+              onClick={handleApply}
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-1.5 text-sm"
+            >
+              신청
+            </Button>
+          </div>
         </div>
       </div>
     </div>
@@ -139,14 +190,76 @@ function ChannelBadge({ channel }: { channel: string }) {
   );
 }
 
-function TemplateTypeSelector({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function TemplateTypeSelector({ value, onChange, types }: { value: string; onChange: (v: string) => void; types: any[] }) {
+  function renderTypeIcon(type: any) {
+    switch (type.value) {
+      case 'text':
+        return (
+          <div className="flex flex-col items-center mt-1">
+            <div className="h-2 w-8 rounded bg-yellow-300 mx-auto mb-1" />
+            <div className="h-2 w-6 rounded bg-gray-300 mx-auto mb-0.5" />
+            <div className="h-2 w-8 rounded bg-gray-300 mx-auto mt-1" />
+          </div>
+        );
+      case 'image':
+        return (
+          <div className="flex flex-col items-center mt-1">
+            <div className="h-2 w-8 rounded bg-yellow-300 mx-auto mb-1" />
+            <div className="h-2 w-6 rounded bg-gray-300 mx-auto mb-0.5" />
+            <div className="w-8 h-5 bg-blue-100 rounded flex items-center justify-center mt-1"><span className="text-blue-500 text-lg">🖼️</span></div>
+          </div>
+        );
+      case 'wide_image':
+        return (
+          <div className="flex flex-col items-center mt-1">
+            <div className="h-2 w-8 rounded bg-yellow-300 mx-auto mb-1" />
+            <div className="h-2 w-6 rounded bg-gray-300 mx-auto mb-0.5" />
+            <div className="h-3 w-12 rounded bg-blue-200 mx-auto mt-1" />
+          </div>
+        );
+      case 'wide_list':
+        return (
+          <div className="flex flex-col items-center mt-1">
+            <div className="h-2 w-8 rounded bg-yellow-300 mx-auto mb-1" />
+            <div className="h-2 w-6 rounded bg-gray-300 mx-auto mb-0.5" />
+            <div className="flex flex-col gap-0.5 mt-1">
+              <div className="h-1 w-10 bg-gray-300 rounded mx-auto" />
+              <div className="h-1 w-10 bg-gray-300 rounded mx-auto" />
+              <div className="h-1 w-10 bg-gray-300 rounded mx-auto" />
+            </div>
+          </div>
+        );
+      case 'carousel':
+        return (
+          <div className="flex flex-col items-center mt-1">
+            <div className="h-2 w-8 rounded bg-yellow-300 mx-auto mb-1" />
+            <div className="h-2 w-6 rounded bg-gray-300 mx-auto mb-0.5" />
+            <div className="flex flex-row gap-1 mt-1">
+              <div className="w-3 h-5 bg-gray-200 rounded" />
+              <div className="w-3 h-5 bg-gray-300 rounded" />
+              <div className="w-3 h-5 bg-gray-400 rounded" />
+            </div>
+          </div>
+        );
+      default:
+        // alimtalk types
+        return (
+          <div className="w-full">
+            <div className="h-2 w-8 rounded bg-yellow-300 mx-auto mb-1" />
+            <div className="h-2 w-6 rounded bg-gray-300 mx-auto mb-0.5" />
+            {type.value === 'image' && <div className="flex justify-end"><span className="inline-block w-4 h-4 bg-blue-100 text-blue-500 text-xs rounded-full flex items-center justify-center">📷</span></div>}
+            {type.value === 'list' && <div className="flex flex-col gap-0.5 mt-1"><div className="h-1 w-6 bg-gray-300 rounded mx-auto" /><div className="h-1 w-6 bg-gray-300 rounded mx-auto" /></div>}
+          </div>
+        );
+    }
+  }
   return (
     <div className="mb-4">
       <div className="font-bold text-base mb-2 text-center mx-auto w-full" style={{maxWidth:'max-content'}}>
         템플릿 유형
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto">
-        {TEMPLATE_TYPES.map((type) => {
+      <div className={`grid ${types.length > 4 ? 'grid-cols-2 sm:grid-cols-5' : 'grid-cols-2 sm:grid-cols-4'} gap-3 max-w-3xl mx-auto`}>
+        {types.map((type) => {
           const selected = value === type.value;
           return (
             <button
@@ -159,12 +272,7 @@ function TemplateTypeSelector({ value, onChange }: { value: string; onChange: (v
               style={{ minHeight: 80 }}
             >
               <div className="w-10 h-6 mb-1 flex items-center justify-center">
-                <div className="w-full">
-                  <div className="h-2 w-8 rounded bg-yellow-300 mx-auto mb-1" />
-                  <div className="h-2 w-6 rounded bg-gray-300 mx-auto mb-0.5" />
-                  {type.value === 'image' && <div className="flex justify-end"><span className="inline-block w-4 h-4 bg-blue-100 text-blue-500 text-xs rounded-full flex items-center justify-center">📷</span></div>}
-                  {type.value === 'list' && <div className="flex flex-col gap-0.5 mt-1"><div className="h-1 w-6 bg-gray-300 rounded mx-auto" /><div className="h-1 w-6 bg-gray-300 rounded mx-auto" /></div>}
-                </div>
+                {renderTypeIcon(type)}
               </div>
               <span className={`mt-1 text-sm font-bold ${selected ? 'text-blue-600' : 'text-gray-700'}`}>{type.label}</span>
               <span className={`absolute top-1 right-1 w-4 h-4 rounded-full border-2 flex items-center justify-center ${selected ? 'border-pink-500 bg-white' : 'border-gray-300 bg-white'}`}>
@@ -179,6 +287,7 @@ function TemplateTypeSelector({ value, onChange }: { value: string; onChange: (v
 }
 
 export default function TemplateExamplesPage() {
+  const router = useRouter();
   const [channelTab, setChannelTab] = useState<keyof ExampleData>("alimtalk");
   const [categoryTab, setCategoryTab] = useState<keyof ExampleCategory>("new");
   const [typeTab, setTypeTab] = useState<string>("basic");
@@ -186,7 +295,9 @@ export default function TemplateExamplesPage() {
   const allExamples: Example[] = EXAMPLES[channelTab][categoryTab] || [];
   const examples = channelTab === "alimtalk"
     ? allExamples.filter((ex) => ex.type === typeTab)
-    : allExamples;
+    : allExamples.filter((ex) => ex.type === typeTab);
+
+  const typeOptions = channelTab === "alimtalk" ? TEMPLATE_TYPES : FRIENDTALK_TEMPLATE_TYPES;
 
   return (
     <div className="min-h-screen bg-[#f7f9fb] px-2 sm:px-6 md:px-10 py-4">
@@ -211,9 +322,7 @@ export default function TemplateExamplesPage() {
             ))}
           </TabsList>
         </Tabs>
-        {channelTab === "alimtalk" && (
-          <TemplateTypeSelector value={typeTab} onChange={setTypeTab} />
-        )}
+        <TemplateTypeSelector value={typeTab} onChange={setTypeTab} types={typeOptions} />
         <Tabs value={categoryTab} onValueChange={v => setCategoryTab(v as keyof ExampleCategory)} className="mb-6">
           <TabsList className="w-full flex gap-2 justify-center bg-transparent">
             {CATEGORIES.map((cat) => (

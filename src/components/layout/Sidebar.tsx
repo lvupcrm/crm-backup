@@ -36,14 +36,26 @@ const menuItems = [
       { title: '신규 등록 고객', href: '/customers/registered', icon: UserPlus },
     ],
   },
+  // 메시지 관리가 캠페인 관리보다 먼저 오도록 위치 변경
   {
-    title: '메시지 자동화',
+    title: '메시지 관리',
     icon: MessageSquare,
     submenu: [
-      { title: '캠페인 관리', href: '/messages/campaigns', icon: Mail },
       { title: '템플릿 만들기', href: '/messages/templates/create', icon: FileText },
       { title: '템플릿 목록', href: '/messages/templates', icon: FileText },
       { title: '템플릿 예시 목록', href: '/messages/templates/examples', icon: FileText },
+      { title: '단체 메시지 발송', href: '/messages/bulk', icon: Mail },
+      { title: '메시지 발송 내역', href: '/messages/logs', icon: Mail },
+    ],
+  },
+  {
+    title: '캠페인 관리',
+    icon: Mail,
+    submenu: [
+      { title: '캠페인 만들기', href: '/messages/campaigns/create', icon: Mail },
+      { title: '캠페인 목록', href: '/messages/campaigns', icon: Mail },
+      { title: '캠페인 예시 목록', href: '/messages/campaigns/examples', icon: Mail },
+      { title: '캠페인 성과', href: '/messages/campaigns/performance', icon: Mail },
     ],
   },
   {
@@ -65,7 +77,7 @@ const menuItems = [
 
 export function Sidebar() {
   const pathname = usePathname()
-  const [expandedItems, setExpandedItems] = useState<string[]>(['고객관리', '메시지 자동화'])
+  const [expandedItems, setExpandedItems] = useState<string[]>(['고객관리', '메시지 관리'])
 
   const toggleExpand = (title: string) => {
     setExpandedItems(prev =>

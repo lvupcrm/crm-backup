@@ -29,20 +29,90 @@ const TEMPLATE_TYPES = [
   { value: "list", label: "리스트형", icon: null },
 ];
 
+const FRIENDTALK_TEMPLATE_TYPES = [
+  { value: "text", label: "텍스트형", icon: null },
+  { value: "image", label: "이미지형", icon: null },
+  { value: "wide_image", label: "와이드 이미지형", icon: null },
+  { value: "wide_list", label: "와이드 아이템 리스트형", icon: null },
+  { value: "carousel", label: "캐러셀 피드형", icon: null },
+];
+
 function ChannelBadge({ channel }: { channel: string }) {
   return (
     <Badge variant={channel === "알림톡" ? "default" : "secondary"}>{channel}</Badge>
   );
 }
 
-function TemplateTypeSelector({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function TemplateTypeSelector({ value, onChange, types }: { value: string; onChange: (v: string) => void; types: any[] }) {
+  function renderTypeIcon(type: any) {
+    switch (type.value) {
+      case 'text':
+        return (
+          <div className="flex flex-col items-center mt-1">
+            <div className="h-2 w-8 rounded bg-yellow-300 mx-auto mb-1" />
+            <div className="h-2 w-6 rounded bg-gray-300 mx-auto mb-0.5" />
+            <div className="h-2 w-8 rounded bg-gray-300 mx-auto mt-1" />
+          </div>
+        );
+      case 'image':
+        return (
+          <div className="flex flex-col items-center mt-1">
+            <div className="h-2 w-8 rounded bg-yellow-300 mx-auto mb-1" />
+            <div className="h-2 w-6 rounded bg-gray-300 mx-auto mb-0.5" />
+            <div className="w-8 h-5 bg-blue-100 rounded flex items-center justify-center mt-1"><span className="text-blue-500 text-lg">🖼️</span></div>
+          </div>
+        );
+      case 'wide_image':
+        return (
+          <div className="flex flex-col items-center mt-1">
+            <div className="h-2 w-8 rounded bg-yellow-300 mx-auto mb-1" />
+            <div className="h-2 w-6 rounded bg-gray-300 mx-auto mb-0.5" />
+            <div className="h-3 w-12 rounded bg-blue-200 mx-auto mt-1" />
+          </div>
+        );
+      case 'wide_list':
+        return (
+          <div className="flex flex-col items-center mt-1">
+            <div className="h-2 w-8 rounded bg-yellow-300 mx-auto mb-1" />
+            <div className="h-2 w-6 rounded bg-gray-300 mx-auto mb-0.5" />
+            <div className="flex flex-col gap-0.5 mt-1">
+              <div className="h-1 w-10 bg-gray-300 rounded mx-auto" />
+              <div className="h-1 w-10 bg-gray-300 rounded mx-auto" />
+              <div className="h-1 w-10 bg-gray-300 rounded mx-auto" />
+            </div>
+          </div>
+        );
+      case 'carousel':
+        return (
+          <div className="flex flex-col items-center mt-1">
+            <div className="h-2 w-8 rounded bg-yellow-300 mx-auto mb-1" />
+            <div className="h-2 w-6 rounded bg-gray-300 mx-auto mb-0.5" />
+            <div className="flex flex-row gap-1 mt-1">
+              <div className="w-3 h-5 bg-gray-200 rounded" />
+              <div className="w-3 h-5 bg-gray-300 rounded" />
+              <div className="w-3 h-5 bg-gray-400 rounded" />
+            </div>
+          </div>
+        );
+      default:
+        // alimtalk types
+        return (
+          <div className="w-full">
+            <div className="h-2 w-8 rounded bg-yellow-300 mx-auto mb-1" />
+            <div className="h-2 w-6 rounded bg-gray-300 mx-auto mb-0.5" />
+            {type.value === 'image' && <div className="flex justify-end"><span className="inline-block w-4 h-4 bg-blue-100 text-blue-500 text-xs rounded-full flex items-center justify-center">📷</span></div>}
+            {type.value === 'list' && <div className="flex flex-col gap-0.5 mt-1"><div className="h-1 w-6 bg-gray-300 rounded mx-auto" /><div className="h-1 w-6 bg-gray-300 rounded mx-auto" /></div>}
+          </div>
+        );
+    }
+  }
   return (
     <div className="mb-4">
       <div className="font-bold text-base mb-2 text-center mx-auto w-full" style={{maxWidth:'max-content'}}>
         템플릿 유형
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto">
-        {TEMPLATE_TYPES.map((type) => {
+      <div className={`grid ${types.length > 4 ? 'grid-cols-2 sm:grid-cols-5' : 'grid-cols-2 sm:grid-cols-4'} gap-3 max-w-3xl mx-auto`}>
+        {types.map((type) => {
           const selected = value === type.value;
           return (
             <button
@@ -55,12 +125,7 @@ function TemplateTypeSelector({ value, onChange }: { value: string; onChange: (v
               style={{ minHeight: 80 }}
             >
               <div className="w-10 h-6 mb-1 flex items-center justify-center">
-                <div className="w-full">
-                  <div className="h-2 w-8 rounded bg-yellow-300 mx-auto mb-1" />
-                  <div className="h-2 w-6 rounded bg-gray-300 mx-auto mb-0.5" />
-                  {type.value === 'image' && <div className="flex justify-end"><span className="inline-block w-4 h-4 bg-blue-100 text-blue-500 text-xs rounded-full flex items-center justify-center">📷</span></div>}
-                  {type.value === 'list' && <div className="flex flex-col gap-0.5 mt-1"><div className="h-1 w-6 bg-gray-300 rounded mx-auto" /><div className="h-1 w-6 bg-gray-300 rounded mx-auto" /></div>}
-                </div>
+                {renderTypeIcon(type)}
               </div>
               <span className={`mt-1 text-sm font-bold ${selected ? 'text-blue-600' : 'text-gray-700'}`}>{type.label}</span>
               <span className={`absolute top-1 right-1 w-4 h-4 rounded-full border-2 flex items-center justify-center ${selected ? 'border-pink-500 bg-white' : 'border-gray-300 bg-white'}`}>
@@ -112,19 +177,55 @@ export default function TemplateListPage() {
     });
   }, [templates, search, channelTab, typeTab]);
 
+  const typeOptions = channelTab === "alimtalk" ? TEMPLATE_TYPES : FRIENDTALK_TEMPLATE_TYPES;
+
   return (
     <div className="min-h-screen bg-[#f7f9fb] px-2 sm:px-6 md:px-10 py-4">
+      {/* 상단 탭: 신청목록/승인된 템플릿 */}
+      <div className="flex justify-center mb-8">
+        <div className="flex gap-4 w-full max-w-2xl justify-center">
+          <button
+            type="button"
+            onClick={() => router.push("/messages/templates/requests")}
+            className={`flex-1 min-w-[180px] max-w-xs h-10 px-4 rounded-full text-base font-bold transition-all border-2
+              bg-gray-100 border-gray-200 text-gray-400
+            `}
+          >
+            신청목록
+          </button>
+          <button
+            type="button"
+            className={`flex-1 min-w-[180px] max-w-xs h-10 px-4 rounded-full text-base font-bold transition-all border-2
+              bg-white border-blue-400 text-blue-700 shadow-md
+            `}
+          >
+            승인된 템플릿
+          </button>
+        </div>
+      </div>
       <div className="mb-6">
         <h1 className="text-xl font-extrabold text-gray-900 mb-4 text-center tracking-tight">템플릿 목록</h1>
-        {/* 상단 탭 */}
-        <Tabs defaultValue="approved" className="mb-6">
-          <TabsList className="w-full flex gap-4 justify-center bg-transparent mb-3">
-            <TabsTrigger value="requests" onClick={() => router.push("/messages/templates/requests")}>신청목록</TabsTrigger>
-            <TabsTrigger value="approved">승인된 템플릿</TabsTrigger>
-          </TabsList>
-        </Tabs>
-        {channelTab === "alimtalk" && (
-          <TemplateTypeSelector value={typeTab} onChange={setTypeTab} />
+        {/* 채널 탭 (알림톡/친구톡) */}
+        <div className="flex w-full justify-center mb-8">
+          <div className="flex gap-4 w-full max-w-2xl">
+            {CHANNELS.map((c) => (
+              <button
+                key={c.value}
+                type="button"
+                onClick={() => setChannelTab(c.value)}
+                className={`flex-1 min-w-[180px] max-w-xs h-10 px-4 rounded-full text-base font-bold transition-all border-2
+                  ${channelTab === c.value
+                    ? 'bg-white border-blue-400 text-blue-700 shadow-md'
+                    : 'bg-gray-100 border-gray-200 text-gray-400'}
+                `}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        {channelTab && (
+          <TemplateTypeSelector value={typeTab} onChange={setTypeTab} types={typeOptions} />
         )}
         <Tabs value={categoryTab} onValueChange={setCategoryTab} className="mb-6">
           <TabsList className="w-full flex gap-2 justify-center bg-transparent">
@@ -165,28 +266,65 @@ export default function TemplateListPage() {
         <div className="col-span-full text-center text-gray-400 py-12 text-lg font-semibold">등록된 템플릿이 없습니다.</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-2">
-          {filteredTemplates.map((t: any) => (
-            <Card key={t.id} className="p-3 flex flex-col justify-between h-full rounded-2xl shadow-xl transition-transform hover:scale-[1.03]" style={{ minHeight: 300 }}>
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-base font-bold">{t.name}</span>
-                  <ChannelBadge channel={t.channel} />
+          {filteredTemplates.map((t: any) => {
+            // Split content for title/subtitle/body/footer (mimic KakaoStyleCard)
+            const lines = (t.content || '').split('\n');
+            const title = lines[0] || '';
+            const subtitle = lines[1] || '';
+            const body = lines.slice(2, lines.length - 2).join('\n');
+            const footer = lines.slice(-2).join('\n');
+            return (
+              <div
+                key={t.id}
+                className="rounded-2xl shadow-xl overflow-hidden bg-[#e5efff] flex flex-col h-full transition-transform hover:scale-[1.03]"
+                style={{ border: '1.5px solid #dbeafe', minHeight: 300 }}
+              >
+                <div className="flex items-center justify-between px-4 py-2" style={{ background: '#ffe812' }}>
+                  <span className="text-xs font-bold text-gray-700 tracking-wide">{t.channel} 도착</span>
+                  <div style={{
+                    background: '#222', color: '#fff', borderRadius: '50%', width: 32, height: 32,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 14, letterSpacing: '-1px', border: '2px solid #fff', boxShadow: '0 1px 2px rgba(0,0,0,0.08)'
+                  }}>{t.channel === '알림톡' ? 'kakao' : 'chingu'}</div>
                 </div>
-                <div className="text-xs text-gray-500 mb-2">변수 {t.variables ? t.variables.length : 0}개</div>
-                <div className="bg-gray-100 rounded p-2 text-xs text-gray-700 line-clamp-3 mb-2 min-h-[48px]">
-                  {t.content}
+                <div className="flex-1 flex flex-col bg-white px-3 py-2">
+                  <div className="text-xs text-gray-400 mb-1">스테이피트니스 둔전점</div>
+                  <div className="text-base font-bold text-gray-900 mb-2" style={{ lineHeight: 1.2 }}>{title}</div>
+                  <div className="text-sm font-semibold text-gray-800 mb-2">{subtitle}</div>
+                  <div className="text-xs text-gray-700 whitespace-pre-line mb-3">{body}</div>
+                  <div className="border-t border-gray-200 my-2" />
+                  <div className="text-xs text-gray-500 whitespace-pre-line mb-2">{footer}</div>
+                  <div className="flex flex-col gap-2 mt-4">
+                    <button
+                      className="w-full rounded bg-[#ffe812] text-gray-900 font-bold py-1.5 text-sm border border-[#ffe812] hover:bg-yellow-300 transition"
+                      style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}
+                    >
+                      채널 추가
+                    </button>
+                    <button
+                      className="w-full rounded bg-gray-100 text-gray-700 font-semibold py-1.5 text-sm border border-gray-200 hover:bg-gray-200 transition"
+                    >
+                      {t.channel === '알림톡' ? '리뷰 작성하기' : '메시지 확인하기'}
+                    </button>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => window.location.href = `/messages/templates/create?id=${t.id}`}
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1.5 text-sm"
+                      >
+                        수정
+                      </Button>
+                      <Button
+                        onClick={() => setDeleteId(t.id)}
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-1.5 text-sm"
+                        variant="destructive"
+                      >
+                        삭제
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="flex gap-2 mt-2">
-                <Button size="sm" variant="outline" onClick={() => window.location.href = `/messages/templates/create?id=${t.id}`}>
-                  <Edit2 className="w-4 h-4" />
-                </Button>
-                <Button size="sm" variant="destructive" onClick={() => setDeleteId(t.id)}>
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            </Card>
-          ))}
+            );
+          })}
         </div>
       )}
       {/* Delete confirmation dialog */}
