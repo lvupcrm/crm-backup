@@ -9,7 +9,7 @@ import { Plus, Search } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { CustomerForm } from '@/components/customers/CustomerForm'
 import { api } from '@/lib/api/client'
-import { ConsultationCustomer } from '@/lib/types'
+import { ConsultationFormData } from '@/lib/types'
 
 export default function ConsultationCustomersPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -22,8 +22,14 @@ export default function ConsultationCustomersPage() {
   })
 
   const createMutation = useMutation({
-    mutationFn: (data: Partial<ConsultationCustomer>) => 
-      api.createConsultationCustomer(data),
+    mutationFn: (formData: any) => {
+      // Convert string date to Date object
+      const data: ConsultationFormData = {
+        ...formData,
+        appointmentDate: new Date(formData.appointmentDate),
+      }
+      return api.createConsultationCustomer(data)
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['consultation-customers'] })
       setIsCreateModalOpen(false)

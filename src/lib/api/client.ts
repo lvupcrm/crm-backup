@@ -4,7 +4,12 @@ import type {
   RegisteredCustomerFormData, 
   ProductFormData, 
   MessageTemplateFormData, 
-  CampaignFormData 
+  CampaignFormData,
+  ConsultationCustomer,
+  RegisteredCustomer,
+  Product,
+  MessageTemplate,
+  Campaign
 } from '@/lib/types'
 
 const apiClient = axios.create({
@@ -41,63 +46,63 @@ apiClient.interceptors.response.use(
 
 export const api = {
   // Customers
-  getConsultationCustomers: (search?: string) =>
+  getConsultationCustomers: (search?: string): Promise<ConsultationCustomer[]> =>
     apiClient.get('/customers/consultation', { params: { search } }),
   
-  createConsultationCustomer: (customer: ConsultationFormData) =>
+  createConsultationCustomer: (customer: ConsultationFormData): Promise<ConsultationCustomer> =>
     apiClient.post('/customers/consultation', customer),
   
-  updateConsultationCustomer: (id: string, customer: ConsultationFormData) =>
+  updateConsultationCustomer: (id: string, customer: ConsultationFormData): Promise<ConsultationCustomer> =>
     apiClient.put(`/customers/consultation/${id}`, customer),
   
-  deleteConsultationCustomer: (id: string) =>
+  deleteConsultationCustomer: (id: string): Promise<void> =>
     apiClient.delete(`/customers/consultation/${id}`),
   
-  getRegisteredCustomers: (search?: string) =>
+  getRegisteredCustomers: (search?: string): Promise<RegisteredCustomer[]> =>
     apiClient.get('/customers/registered', { params: { search } }),
   
-  createRegisteredCustomer: (customer: RegisteredCustomerFormData) =>
+  createRegisteredCustomer: (customer: RegisteredCustomerFormData): Promise<RegisteredCustomer> =>
     apiClient.post('/customers/registered', customer),
   
-  updateRegisteredCustomer: (id: string, customer: RegisteredCustomerFormData) =>
+  updateRegisteredCustomer: (id: string, customer: RegisteredCustomerFormData): Promise<RegisteredCustomer> =>
     apiClient.put(`/customers/registered/${id}`, customer),
   
-  deleteRegisteredCustomer: (id: string) =>
+  deleteRegisteredCustomer: (id: string): Promise<void> =>
     apiClient.delete(`/customers/registered/${id}`),
   
   // Messages
-  getTemplates: () => apiClient.get('/messages/templates'),
+  getTemplates: (): Promise<MessageTemplate[]> => apiClient.get('/messages/templates'),
   
-  createTemplate: (template: MessageTemplateFormData) =>
+  createTemplate: (template: MessageTemplateFormData): Promise<MessageTemplate> =>
     apiClient.post('/messages/templates', template),
   
-  updateTemplate: (id: string, template: MessageTemplateFormData) =>
+  updateTemplate: (id: string, template: MessageTemplateFormData): Promise<MessageTemplate> =>
     apiClient.put(`/messages/templates/${id}`, template),
   
-  deleteTemplate: (id: string) =>
+  deleteTemplate: (id: string): Promise<void> =>
     apiClient.delete(`/messages/templates/${id}`),
   
-  getCampaigns: () => apiClient.get('/messages/campaigns'),
+  getCampaigns: (): Promise<Campaign[]> => apiClient.get('/messages/campaigns'),
   
-  createCampaign: (campaign: CampaignFormData) =>
+  createCampaign: (campaign: CampaignFormData): Promise<Campaign> =>
     apiClient.post('/messages/campaigns', campaign),
   
-  updateCampaign: (id: string, campaign: CampaignFormData) =>
+  updateCampaign: (id: string, campaign: CampaignFormData): Promise<Campaign> =>
     apiClient.put(`/messages/campaigns/${id}`, campaign),
   
-  deleteCampaign: (id: string) =>
+  deleteCampaign: (id: string): Promise<void> =>
     apiClient.delete(`/messages/campaigns/${id}`),
   
   // Products
-  getProducts: () => apiClient.get('/products'),
+  getProducts: (): Promise<Product[]> => apiClient.get('/products'),
   
-  createProduct: (product: ProductFormData) =>
+  createProduct: (product: ProductFormData): Promise<Product> =>
     apiClient.post('/products', product),
   
-  updateProduct: (id: string, product: ProductFormData) =>
+  updateProduct: (id: string, product: ProductFormData): Promise<Product> =>
     apiClient.put(`/products/${id}`, product),
   
-  deleteProduct: (id: string) =>
+  deleteProduct: (id: string): Promise<void> =>
     apiClient.delete(`/products/${id}`),
   
   // Statistics
