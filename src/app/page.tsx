@@ -3,15 +3,19 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+interface User {
+  id: string;
+  email: string;
+  name: string;
+}
+
 export default function Home() {
-  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     const stored = localStorage.getItem('currentUser');
     if (stored) {
-      setUser(JSON.parse(stored));
       // 로그인된 사용자는 CRM으로 리다이렉트
       router.replace('/crm');
     } else {

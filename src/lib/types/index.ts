@@ -1,4 +1,6 @@
 import { User, Role, Branch, ConsultationCustomer, RegisteredCustomer, Product, Payment, MessageTemplate, Campaign, ScheduledMessage } from '@prisma/client'
+import 'next-auth'
+import 'next-auth/jwt'
 
 export type UserWithRelations = User & {
   role: Role
@@ -39,7 +41,7 @@ export type ScheduledMessageWithRelations = ScheduledMessage & {
 }
 
 // API Response Types
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean
   data?: T
   error?: string
@@ -155,4 +157,39 @@ export interface ExtendedSession {
     permissions: UserPermissions
   }
   expires: string
+}
+
+// NextAuth 타입 확장
+declare module 'next-auth' {
+  interface User {
+    id: string
+    email: string
+    name: string
+    role: string
+    roleId: string
+    branchId?: string
+    permissions: UserPermissions
+  }
+  
+  interface Session {
+    user: {
+      id: string
+      email: string
+      name: string
+      role: string
+      roleId: string
+      branchId?: string
+      permissions: UserPermissions
+    }
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    id: string
+    role: string
+    roleId: string
+    branchId?: string
+    permissions: UserPermissions
+  }
 }

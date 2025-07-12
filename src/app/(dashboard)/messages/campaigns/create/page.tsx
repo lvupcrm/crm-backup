@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import Mermaid from '@/components/ui/mermaid';
+import { Mermaid } from '@/components/ui/mermaid';
 
 const customerActions = [
   "고객이 회원가입을 완료했을 때",

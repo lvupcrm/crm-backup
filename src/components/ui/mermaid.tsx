@@ -1,28 +1,32 @@
-import React, { useEffect, useRef } from 'react';
+'use client'
+
+import { useEffect, useRef } from 'react'
+import mermaid from 'mermaid'
 
 interface MermaidProps {
-  chart: string;
+  chart: string
+  className?: string
 }
 
-const Mermaid: React.FC<MermaidProps> = ({ chart }) => {
-  const ref = useRef<HTMLDivElement>(null);
+export function Mermaid({ chart, className }: MermaidProps) {
+  const elementRef = useRef<HTMLDivElement>(null)
+  const renderId = `mermaid-${Math.random().toString(36).substr(2, 9)}`
 
   useEffect(() => {
-    let mermaid: any;
-    let renderId = 'mermaid-diagram-' + Math.random().toString(36).substr(2, 9);
-    import('mermaid').then((m) => {
-      mermaid = m.default || m;
-      mermaid.initialize({ startOnLoad: false });
-      if (ref.current) {
-        mermaid.render(renderId, chart).then(({ svg }: { svg: string }) => {
-          if (ref.current) ref.current.innerHTML = svg;
-        });
-      }
-    });
-    // eslint-disable-next-line
-  }, [chart]);
+    if (elementRef.current) {
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        securityLevel: 'loose',
+      })
+      
+      mermaid.render(renderId, chart).then(({ svg }) => {
+        if (elementRef.current) {
+          elementRef.current.innerHTML = svg
+        }
+      })
+    }
+  }, [chart, renderId])
 
-  return <div ref={ref} style={{ width: '100%', overflowX: 'auto' }} />;
-};
-
-export default Mermaid; 
+  return <div ref={elementRef} className={className} />
+} 

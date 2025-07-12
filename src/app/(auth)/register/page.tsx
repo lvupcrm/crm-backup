@@ -8,6 +8,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
+interface User {
+  id: string
+  email: string
+  password: string
+  name: string
+}
+
 export default function RegisterPage() {
   const router = useRouter()
   const [form, setForm] = useState({ email: '', password: '', name: '' })
@@ -27,7 +34,7 @@ export default function RegisterPage() {
 
     // LocalStorage에 유저 저장
     const users = JSON.parse(localStorage.getItem('users') || '[]')
-    if (users.find((u: any) => u.email === form.email)) {
+    if (users.find((u: User) => u.email === form.email)) {
       setError('이미 존재하는 이메일입니다.')
       setLoading(false)
       return
@@ -46,31 +53,60 @@ export default function RegisterPage() {
           <CardTitle className="text-2xl text-center">회원가입</CardTitle>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <Alert variant="destructive">
+              <Alert>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
+            
             {success && (
-              <Alert variant="default">
-                <AlertDescription>회원가입 성공! 로그인 페이지로 이동합니다.</AlertDescription>
+              <Alert>
+                <AlertDescription>회원가입이 완료되었습니다!</AlertDescription>
               </Alert>
             )}
-            <div>
+            
+            <div className="space-y-2">
               <Label htmlFor="name">이름</Label>
-              <Input id="name" name="name" value={form.name} onChange={handleChange} required />
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                value={form.name}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              />
             </div>
-            <div>
+            
+            <div className="space-y-2">
               <Label htmlFor="email">이메일</Label>
-              <Input id="email" name="email" type="email" value={form.email} onChange={handleChange} required />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              />
             </div>
-            <div>
+            
+            <div className="space-y-2">
               <Label htmlFor="password">비밀번호</Label>
-              <Input id="password" name="password" type="password" value={form.password} onChange={handleChange} required />
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                value={form.password}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              />
             </div>
+            
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? '가입 중...' : '회원가입'}
+              {loading ? '처리 중...' : '회원가입'}
             </Button>
           </form>
         </CardContent>

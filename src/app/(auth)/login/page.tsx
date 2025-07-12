@@ -9,6 +9,13 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2 } from 'lucide-react'
 
+interface User {
+  id: string
+  email: string
+  name: string
+  password: string
+}
+
 export default function LoginPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
@@ -24,7 +31,7 @@ export default function LoginPage() {
     setError('')
 
     const users = JSON.parse(localStorage.getItem('users') || '[]')
-    const user = users.find((u: any) => u.email === formData.email && u.password === formData.password)
+    const user = users.find((u: User) => u.email === formData.email && u.password === formData.password)
     if (!user) {
       setError('이메일 또는 비밀번호가 올바르지 않습니다.')
       setIsLoading(false)
@@ -37,50 +44,57 @@ export default function LoginPage() {
     setIsLoading(false)
   }
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">
-            Fitness CRM
-          </CardTitle>
+        <CardHeader>
+          <CardTitle className="text-2xl text-center">로그인</CardTitle>
           <CardDescription className="text-center">
-            계정에 로그인하세요
+            피트니스 CRM에 로그인하세요
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <Alert variant="destructive">
+              <Alert>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
+            
             <div className="space-y-2">
               <Label htmlFor="email">이메일</Label>
               <Input
                 id="email"
+                name="email"
                 type="email"
-                placeholder="name@example.com"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={handleChange}
                 required
+                disabled={isLoading}
               />
             </div>
+            
             <div className="space-y-2">
               <Label htmlFor="password">비밀번호</Label>
               <Input
                 id="password"
+                name="password"
                 type="password"
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={handleChange}
                 required
+                disabled={isLoading}
               />
             </div>
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
+            
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -91,12 +105,6 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
-          <p className="text-center text-sm mt-4">
-            계정이 없으신가요?{' '}
-            <a href="/register" className="text-blue-600 underline">
-              회원가입
-            </a>
-          </p>
         </CardContent>
       </Card>
     </div>

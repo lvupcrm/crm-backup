@@ -81,7 +81,9 @@ export default function TemplateRequestsPage() {
 
   const handleSubmitRequest = () => {
     // 템플릿 신청 처리 로직
-    console.log('템플릿 신청:', newRequest);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('템플릿 신청:', newRequest);
+    }
     setShowNewRequestDialog(false);
     // 실제로는 API 호출하여 신청 처리
   };

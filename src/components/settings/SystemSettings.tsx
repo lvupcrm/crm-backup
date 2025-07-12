@@ -20,7 +20,9 @@ export function SystemSettings() {
 
   const handleSave = () => {
     // 설정 저장 로직
-    console.log('설정 저장:', settings)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('설정 저장:', settings);
+    }
   }
 
   return (

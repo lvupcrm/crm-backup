@@ -3,6 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
+import type { UserPermissions } from '@/lib/types'
 
 const handler = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -37,7 +38,7 @@ const handler = NextAuth({
           role: user.role.name,
           roleId: user.roleId,
           branchId: user.branchId,
-          permissions: user.role.permissions
+          permissions: user.role.permissions as UserPermissions
         }
       }
     })
@@ -59,7 +60,7 @@ const handler = NextAuth({
         session.user.role = token.role as string
         session.user.roleId = token.roleId as string
         session.user.branchId = token.branchId as string
-        session.user.permissions = token.permissions as any
+        session.user.permissions = token.permissions as UserPermissions
       }
       return session
     }

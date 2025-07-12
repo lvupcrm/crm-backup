@@ -1,4 +1,11 @@
 import axios from 'axios'
+import type { 
+  ConsultationFormData, 
+  RegisteredCustomerFormData, 
+  ProductFormData, 
+  MessageTemplateFormData, 
+  CampaignFormData 
+} from '@/lib/types'
 
 const apiClient = axios.create({
   baseURL: '/api',
@@ -37,10 +44,10 @@ export const api = {
   getConsultationCustomers: (search?: string) =>
     apiClient.get('/customers/consultation', { params: { search } }),
   
-  createConsultationCustomer: (customer: any) =>
+  createConsultationCustomer: (customer: ConsultationFormData) =>
     apiClient.post('/customers/consultation', customer),
   
-  updateConsultationCustomer: (id: string, customer: any) =>
+  updateConsultationCustomer: (id: string, customer: ConsultationFormData) =>
     apiClient.put(`/customers/consultation/${id}`, customer),
   
   deleteConsultationCustomer: (id: string) =>
@@ -49,10 +56,10 @@ export const api = {
   getRegisteredCustomers: (search?: string) =>
     apiClient.get('/customers/registered', { params: { search } }),
   
-  createRegisteredCustomer: (customer: any) =>
+  createRegisteredCustomer: (customer: RegisteredCustomerFormData) =>
     apiClient.post('/customers/registered', customer),
   
-  updateRegisteredCustomer: (id: string, customer: any) =>
+  updateRegisteredCustomer: (id: string, customer: RegisteredCustomerFormData) =>
     apiClient.put(`/customers/registered/${id}`, customer),
   
   deleteRegisteredCustomer: (id: string) =>
@@ -61,10 +68,10 @@ export const api = {
   // Messages
   getTemplates: () => apiClient.get('/messages/templates'),
   
-  createTemplate: (template: any) =>
+  createTemplate: (template: MessageTemplateFormData) =>
     apiClient.post('/messages/templates', template),
   
-  updateTemplate: (id: string, template: any) =>
+  updateTemplate: (id: string, template: MessageTemplateFormData) =>
     apiClient.put(`/messages/templates/${id}`, template),
   
   deleteTemplate: (id: string) =>
@@ -72,10 +79,10 @@ export const api = {
   
   getCampaigns: () => apiClient.get('/messages/campaigns'),
   
-  createCampaign: (campaign: any) =>
+  createCampaign: (campaign: CampaignFormData) =>
     apiClient.post('/messages/campaigns', campaign),
   
-  updateCampaign: (id: string, campaign: any) =>
+  updateCampaign: (id: string, campaign: CampaignFormData) =>
     apiClient.put(`/messages/campaigns/${id}`, campaign),
   
   deleteCampaign: (id: string) =>
@@ -84,17 +91,18 @@ export const api = {
   // Products
   getProducts: () => apiClient.get('/products'),
   
-  createProduct: (product: any) =>
+  createProduct: (product: ProductFormData) =>
     apiClient.post('/products', product),
   
-  updateProduct: (id: string, product: any) =>
+  updateProduct: (id: string, product: ProductFormData) =>
     apiClient.put(`/products/${id}`, product),
   
   deleteProduct: (id: string) =>
     apiClient.delete(`/products/${id}`),
   
   // Statistics
-  getDashboardStats: () => apiClient.get('/statistics/dashboard'),
+  getStatistics: () => apiClient.get('/statistics'),
   
-  getRecentRegisteredCustomers: () => apiClient.get('/statistics/recent-customers'),
+  // Payments
+  getPayments: () => apiClient.get('/payments'),
 }
