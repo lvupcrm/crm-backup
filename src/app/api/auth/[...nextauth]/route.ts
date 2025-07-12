@@ -1,12 +1,10 @@
 import NextAuth from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { PrismaAdapter } from '@auth/prisma-adapter'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 import type { UserPermissions } from '@/lib/types'
 
 const handler = NextAuth({
-  adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -37,8 +35,8 @@ const handler = NextAuth({
           name: user.name,
           role: user.role.name,
           roleId: user.roleId,
-          branchId: user.branchId,
-          permissions: user.role.permissions as UserPermissions
+          branchId: user.branchId || undefined,
+          permissions: user.role.permissions as unknown as UserPermissions
         }
       }
     })
