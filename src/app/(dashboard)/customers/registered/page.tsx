@@ -14,7 +14,7 @@ export default function RegisteredCustomersPage() {
     queryKey: ['registered-customers', searchTerm],
     queryFn: async () => {
       const res = await api.getRegisteredCustomers(searchTerm);
-      return res.data || [];
+      return res || [];
     },
   });
 

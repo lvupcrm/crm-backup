@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { api } from '@/lib/api/client'
 
 type TemplateRequest = {
   id: string;
@@ -71,7 +72,10 @@ export default function TemplateRequestsPage() {
   // 모든 템플릿 불러오기
   const { data: templates, isLoading, isError } = useQuery({
     queryKey: ["templates-all"],
-    queryFn: () => import("@/lib/api/client").then((m) => m.api.getTemplates()).then((res: any) => res.data),
+    queryFn: async () => {
+      const res = await api.getTemplates()
+      return res || []
+    },
   });
 
   const filteredTemplates = useMemo(() => {

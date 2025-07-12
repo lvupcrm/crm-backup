@@ -12,10 +12,9 @@ export default function UnregisteredCustomersPage() {
 
   const { data: customers, isLoading } = useQuery({
     queryKey: ['unregistered-customers', searchTerm],
-    // TODO: Replace with api.getUnregisteredCustomers when implemented
     queryFn: async () => {
-      const res = await api.getRegisteredCustomers(searchTerm);
-      return res.data || [];
+      const res = await api.getConsultationCustomers(searchTerm);
+      return res || [];
     },
   });
 
@@ -41,7 +40,7 @@ export default function UnregisteredCustomersPage() {
         ) : (
           <CustomerTable
             customers={customers || []}
-            type="registered" // 임시로 registered 타입 사용, 필요시 unregistered 타입 추가
+            type="consultation"
           />
         )}
       </div>

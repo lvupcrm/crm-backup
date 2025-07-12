@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Edit2, Trash2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { api } from '@/lib/api/client'
 
 const CHANNELS = [
   { value: "alimtalk", label: "알림톡 템플릿" },
@@ -151,9 +152,10 @@ export default function TemplateListPage() {
   // Fetch templates
   const { data: templates, isLoading, isError } = useQuery({
     queryKey: ["templates"],
-    queryFn: () =>
-      // api.getTemplates() should return { data: Template[] }
-      import("@/lib/api/client").then((m) => m.api.getTemplates()).then((res: any) => res.data),
+    queryFn: async () => {
+      const res = await api.getTemplates()
+      return res || []
+    },
   });
 
   // Delete mutation
