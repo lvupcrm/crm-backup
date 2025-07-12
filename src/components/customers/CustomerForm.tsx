@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ConsultationCustomer } from '@/lib/types'
+import React from 'react'
 
 const consultationSchema = z.object({
   name: z.string().min(1, '이름을 입력해주세요'),
@@ -40,11 +41,30 @@ export function CustomerForm({ type, customer, onSubmit, isLoading }: CustomerFo
     watch,
   } = useForm<FormData>({
     resolver: zodResolver(consultationSchema),
-    defaultValues: customer || {
+    defaultValues: {
       consultationStatus: '미상담',
       registrationStatus: '미등록',
     },
   })
+
+  // customer가 있으면 폼에 값 설정
+  React.useEffect(() => {
+    if (customer) {
+      setValue('name', customer.name)
+      setValue('phone', customer.phone)
+      setValue('appointmentDate', customer.appointmentDate instanceof Date 
+        ? customer.appointmentDate.toISOString().slice(0, 16)
+        : typeof customer.appointmentDate === 'string'
+        ? customer.appointmentDate
+        : '')
+      setValue('inquiryChannel', customer.inquiryChannel)
+      setValue('sport', customer.sport)
+      setValue('appointmentPurpose', customer.appointmentPurpose as '상담' | '체험' | '기타')
+      setValue('consultationStatus', customer.consultationStatus as '미상담' | '상담완료')
+      setValue('registrationStatus', customer.registrationStatus as '미등록' | '등록완료')
+      setValue('memo', customer.memo || '')
+    }
+  }, [customer, setValue])
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
