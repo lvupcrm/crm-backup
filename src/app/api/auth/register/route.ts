@@ -14,13 +14,54 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: '이미 존재하는 이메일입니다.' }, { status: 409 })
   }
 
+  // 기본 역할을 찾거나 생성
+  let defaultRole = await prisma.role.findFirst({
+    where: { name: 'staff' }
+  })
+
+  if (!defaultRole) {
+    defaultRole = await prisma.role.create({
+      data: {
+        name: 'staff',
+        permissions: {
+          customers: {
+            view: true,
+            create: false,
+            edit: false,
+            delete: false
+          },
+          messages: {
+            view: false,
+            create: false,
+            edit: false,
+            delete: false,
+            send: false
+          },
+          products: {
+            view: true,
+            create: false,
+            edit: false,
+            delete: false
+          },
+          statistics: {
+            view: false
+          },
+          settings: {
+            view: false,
+            edit: false
+          }
+        }
+      }
+    })
+  }
+
   const hashed = await bcrypt.hash(password, 10)
   const user = await prisma.user.create({
     data: {
       email,
       password: hashed,
       name,
-      // 필요시 roleId, branchId 등 추가
+      roleId: defaultRole.id,
     }
   })
 
