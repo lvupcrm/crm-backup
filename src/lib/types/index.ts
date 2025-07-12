@@ -2,6 +2,9 @@ import { User, Role, Branch, ConsultationCustomer, RegisteredCustomer, Product, 
 import 'next-auth'
 import 'next-auth/jwt'
 
+// Prisma 기본 타입들 export
+export type { User, Role, Branch, ConsultationCustomer, RegisteredCustomer, Product, Payment, MessageTemplate, Campaign, ScheduledMessage }
+
 export type UserWithRelations = User & {
   role: Role
   branch?: Branch | null
