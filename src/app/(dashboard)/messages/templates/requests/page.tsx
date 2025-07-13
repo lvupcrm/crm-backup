@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,7 @@ type TemplateRequest = {
   fromExample?: boolean;
 };
 
-export default function TemplateRequestsPage() {
+function TemplateRequestsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
@@ -213,4 +213,12 @@ export default function TemplateRequestsPage() {
       </Dialog>
     </div>
   );
-} 
+}
+
+export default function TemplateRequestsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TemplateRequestsContent />
+    </Suspense>
+  );
+}
