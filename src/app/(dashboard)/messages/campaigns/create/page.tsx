@@ -1,6 +1,6 @@
 "use client";
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,7 @@ const templates = [
   { value: "쿠폰 기간 만료 안내", label: "쿠폰 기간 만료 안내" },
 ];
 
-export default function CampaignCreatePage() {
+function CampaignCreateContent() {
   const params = useSearchParams();
   const [action, setAction] = useState(customerActions[0]);
   const [waitType, setWaitType] = useState("즉시");
@@ -283,4 +283,12 @@ export default function CampaignCreatePage() {
       </div>
     </div>
   );
-} 
+}
+
+export default function CampaignCreatePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CampaignCreateContent />
+    </Suspense>
+  );
+}
