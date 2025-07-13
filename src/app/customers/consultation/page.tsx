@@ -231,7 +231,7 @@ const ConsultationPage = () => {
   };
 
   const handleSaveModal = () => {
-    handleSubmit(new Event('submit') as any); // Simulate form submission
+    handleSubmit(new Event('submit') as React.FormEvent);
   };
 
   const handleCancelModal = () => {
