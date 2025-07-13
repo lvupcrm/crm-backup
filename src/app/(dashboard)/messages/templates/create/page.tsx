@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useMutation } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
@@ -227,7 +227,7 @@ function TemplateTypeSelector({ value, onChange, types }: { value: string; onCha
   );
 }
 
-export default function CreateTemplatePage() {
+function CreateTemplateContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [channelTab, setChannelTab] = useState<'alimtalk' | 'friendtalk'>('alimtalk');
@@ -609,4 +609,12 @@ export default function CreateTemplatePage() {
       </form>
     </div>
   )
+}
+
+export default function CreateTemplatePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CreateTemplateContent />
+    </Suspense>
+  );
 }
