@@ -18,7 +18,7 @@ import 'react-calendar/dist/Calendar.css';
 import './calendar-crm.css'; // 커스텀 캘린더 스타일 추가
 import { format, isSameDay, parseISO, compareAsc, startOfDay, endOfDay, startOfWeek, endOfWeek, isWithinInterval, startOfMonth, endOfMonth } from 'date-fns';
 import { User2, CalendarDays, CheckCircle2, UserPlus, UserX, Ban } from 'lucide-react';
-import { Select } from '@/components/ui/select';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 interface ConsultationCustomer {
   id: string;
@@ -92,6 +92,10 @@ export default function CrmHome() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSelectChange = (name: string) => (value: string) => {
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -314,7 +318,7 @@ export default function CrmHome() {
             </div>
             <div>
               <Label htmlFor="inquiryChannel">문의 채널</Label>
-              <Select value={form.inquiryChannel} onValueChange={handleChange} name="inquiryChannel" required>
+              <Select value={form.inquiryChannel} onValueChange={handleSelectChange("inquiryChannel")} name="inquiryChannel" required>
                 <SelectTrigger>
                   <SelectValue placeholder="문의 채널 선택" />
                 </SelectTrigger>
@@ -613,7 +617,7 @@ export default function CrmHome() {
               </div>
               <div>
                 <Label htmlFor="newConsultationInquiryChannel">문의 채널</Label>
-                <Select value={form.inquiryChannel} onValueChange={handleChange} name="inquiryChannel" required>
+                <Select value={form.inquiryChannel} onValueChange={handleSelectChange("inquiryChannel")} name="inquiryChannel" required>
                   <SelectTrigger>
                     <SelectValue placeholder="문의 채널 선택" />
                   </SelectTrigger>
