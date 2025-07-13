@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '../../../components/ui/button';
-import { Input } from '../../../components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Dialog,
   DialogTrigger,
@@ -11,14 +11,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogClose,
-} from '../../../components/ui/dialog';
-import { Label } from '../../../components/ui/label';
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import './calendar-crm.css'; // 커스텀 캘린더 스타일 추가
 import { format, isSameDay, parseISO, compareAsc, startOfDay, endOfDay, startOfWeek, endOfWeek, isWithinInterval, startOfMonth, endOfMonth } from 'date-fns';
 import { User2, CalendarDays, CheckCircle2, UserPlus, UserX, Ban } from 'lucide-react';
-import { Select } from '../../../components/ui/select';
+import { Select } from '@/components/ui/select';
 
 interface ConsultationCustomer {
   id: string;
