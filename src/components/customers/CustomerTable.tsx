@@ -124,7 +124,7 @@ export function CustomerTable({ customers, type }: CustomerTableProps) {
             <TableCell>
               {format(new Date(customer.membershipExpiry), 'yyyy-MM-dd', { locale: ko })}
             </TableCell>
-            <TableCell>{customer.trainer?.name || '미배정'}</TableCell>
+            <TableCell>{(customer as any).trainer?.name || '미배정'}</TableCell>
             <TableCell>{getStatusBadge(customer.status)}</TableCell>
             <TableCell>
               <div className="flex gap-2">
