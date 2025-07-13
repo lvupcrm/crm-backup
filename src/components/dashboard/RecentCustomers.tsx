@@ -7,7 +7,7 @@ import { api } from '@/lib/api/client'
 export function RecentCustomers() {
   const { data: customers } = useQuery({
     queryKey: ['recent-customers'],
-    queryFn: api.getRecentRegisteredCustomers,
+    queryFn: () => api.getRegisteredCustomers(),
   })
 
   return (
