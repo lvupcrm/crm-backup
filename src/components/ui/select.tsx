@@ -10,7 +10,7 @@ type SelectProps = {
 
 export function Select({ value, onValueChange, name, required, children }: SelectProps) {
   return (
-    <select value={value} onChange={e => onValueChange(e.target.value)} name={name} required={required} style={{ padding: '8px', borderRadius: 4, border: '1px solid #ccc' }}>
+    <select value={value} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onValueChange(e.target.value)} name={name} required={required} style={{ padding: '8px', borderRadius: 4, border: '1px solid #ccc' }}>
       {children}
     </select>
   );

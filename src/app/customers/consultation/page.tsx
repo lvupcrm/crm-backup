@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import './calendar-crm.css';
-import { format, isSameDay, parseISO, compareAsc, startOfWeek, endOfWeek, isWithinInterval, startOfMonth, endOfMonth } from 'date-fns';
+import { format, isSameDay, parseISO, startOfWeek, endOfWeek, isWithinInterval, startOfMonth, endOfMonth } from 'date-fns';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 const initialForm = {
@@ -202,8 +202,10 @@ const ConsultationPage = () => {
     }
   };
 
-  const handleDateChange = (selectedDate: Date) => {
-    setDate(format(selectedDate, 'yyyy-MM-dd'));
+  const handleDateChange = (value: any) => {
+    if (value instanceof Date) {
+      setDate(format(value, 'yyyy-MM-dd'));
+    }
   };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -231,7 +233,10 @@ const ConsultationPage = () => {
   };
 
   const handleSaveModal = () => {
-    handleSubmit(new Event('submit') as React.FormEvent);
+    const fakeEvent = {
+      preventDefault: () => {},
+    } as React.FormEvent;
+    handleSubmit(fakeEvent);
   };
 
   const handleCancelModal = () => {
@@ -279,7 +284,7 @@ const ConsultationPage = () => {
         </div>
         <div>
           <Label htmlFor="consultationType">Consultation Type</Label>
-          <Select onValueChange={handleConsultationTypeChange} value={form.consultationType}>
+          <Select onValueChange={(value: string) => setForm(prev => ({ ...prev, consultationType: value }))} value={form.consultationType}>
             <SelectTrigger>
               <SelectValue placeholder="Select a type" />
             </SelectTrigger>
@@ -292,7 +297,7 @@ const ConsultationPage = () => {
         </div>
         <div>
           <Label htmlFor="consultationStatus">Status</Label>
-          <Select onValueChange={handleConsultationStatusChange} value={form.consultationStatus}>
+          <Select onValueChange={(value: string) => setForm(prev => ({ ...prev, consultationStatus: value }))} value={form.consultationStatus}>
             <SelectTrigger>
               <SelectValue placeholder="Select a status" />
             </SelectTrigger>
@@ -332,13 +337,13 @@ const ConsultationPage = () => {
                 <td className="py-2 px-4 border-b">{customer.consultationStatus}</td>
                 <td className="py-2 px-4 border-b">{customer.notes}</td>
                 <td className="py-2 px-4 border-b">
-                  <Button variant="outline" onClick={() => handleEdit(customer)}>Edit</Button>
-                  <Button variant="outline" onClick={() => handleDelete(customer.id)}>Delete</Button>
+                  <Button onClick={() => handleEdit(customer)}>Edit</Button>
+                  <Button onClick={() => handleDelete(customer.id)}>Delete</Button>
                   {customer.consultationStatus !== 'Completed' && (
-                    <Button variant="outline" onClick={() => handleComplete(customer.id)}>Complete</Button>
+                    <Button onClick={() => handleComplete(customer.id)}>Complete</Button>
                   )}
-                  <Select onValueChange={handleNotificationStatusChange} value={customer.notificationStatus}>
-                    <SelectTrigger className="w-[180px]">
+                  <Select onValueChange={(value: string) => handleNotificationStatusChange(customer.id, value)} value={customer.notificationStatus}>
+                    <SelectTrigger>
                       <SelectValue placeholder="Notification Status" />
                     </SelectTrigger>
                     <SelectContent>
@@ -361,7 +366,7 @@ const ConsultationPage = () => {
       )}
 
       {showNewConsultationModal && (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>{editingId ? 'Edit Consultation' : 'New Consultation'}</DialogTitle>
@@ -442,7 +447,7 @@ const ConsultationPage = () => {
                 />
               </div>
               <div className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={handleCancelModal}>Cancel</Button>
+                <Button onClick={handleCancelModal}>Cancel</Button>
                 <Button type="submit">{editingId ? 'Update' : 'Add'} Consultation</Button>
               </div>
             </form>

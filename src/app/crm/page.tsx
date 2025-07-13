@@ -16,7 +16,7 @@ import { Label } from '@/components/ui/label';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import './calendar-crm.css'; // 커스텀 캘린더 스타일 추가
-import { format, isSameDay, parseISO, compareAsc, startOfDay, endOfDay, startOfWeek, endOfWeek, isWithinInterval, startOfMonth, endOfMonth } from 'date-fns';
+import { format, isSameDay, parseISO, compareAsc, startOfWeek, endOfWeek, isWithinInterval, startOfMonth, endOfMonth } from 'date-fns';
 import { User2, CalendarDays, CheckCircle2, UserPlus, UserX, Ban } from 'lucide-react';
 import { Select } from '@/components/ui/select';
 
@@ -101,25 +101,19 @@ export default function CrmHome() {
       setCustomers((prev) =>
         prev.map((c) => (c.id === editingId ? updatedCustomer : c))
       );
-      
       // 상담고객 페이지 localStorage 업데이트
       const existingConsultationCustomers = JSON.parse(localStorage.getItem('consultationCustomers') || '[]');
       const updatedConsultationCustomers = existingConsultationCustomers.map((c: any) => 
         c.id === editingId ? updatedCustomer : c
       );
       localStorage.setItem('consultationCustomers', JSON.stringify(updatedConsultationCustomers));
-      
-      // 수정 성공 알림 표시
       setNotification({ 
         message: `${updatedCustomer.name} 고객 정보가 수정되었습니다.`, 
         type: 'success' 
       });
-      
-      // 3초 후 알림 제거
       setTimeout(() => {
         setNotification(null);
       }, 3000);
-      
       setEditingId(null);
     } else {
       const newCustomer = { ...form, id: crypto.randomUUID(), notificationStatus: '미발송' };
@@ -127,18 +121,12 @@ export default function CrmHome() {
         ...prev,
         newCustomer,
       ]);
-      
-      // 상담고객 페이지 localStorage에 새 고객 추가
       const existingConsultationCustomers = JSON.parse(localStorage.getItem('consultationCustomers') || '[]');
       localStorage.setItem('consultationCustomers', JSON.stringify([...existingConsultationCustomers, newCustomer]));
-      
-      // 성공 알림 표시
       setNotification({ 
         message: `${newCustomer.name} 고객이 상담고객으로 등록되었습니다.`, 
         type: 'success' 
       });
-      
-      // 3초 후 알림 제거
       setTimeout(() => {
         setNotification(null);
       }, 3000);
@@ -160,12 +148,9 @@ export default function CrmHome() {
 
   const handleDelete = (id: string) => {
     setCustomers((prev) => prev.filter((c) => c.id !== id));
-    
-    // 상담고객 페이지 localStorage에서도 삭제
     const existingConsultationCustomers = JSON.parse(localStorage.getItem('consultationCustomers') || '[]');
     const filteredConsultationCustomers = existingConsultationCustomers.filter((c: any) => c.id !== id);
     localStorage.setItem('consultationCustomers', JSON.stringify(filteredConsultationCustomers));
-    
     if (editingId === id) {
       setForm(initialForm);
       setEditingId(null);
@@ -220,8 +205,6 @@ export default function CrmHome() {
   const handleStatusChange = (id: string, field: 'consultationStatus' | 'registrationStatus', value: string) => {
     const updatedCustomer = { ...customers.find(c => c.id === id)!, [field]: value };
     setCustomers(prev => prev.map(c => c.id === id ? updatedCustomer : c));
-    
-    // 상담고객 페이지 localStorage 업데이트
     const existingConsultationCustomers = JSON.parse(localStorage.getItem('consultationCustomers') || '[]');
     const updatedConsultationCustomers = existingConsultationCustomers.map((c: any) => 
       c.id === id ? updatedCustomer : c
@@ -233,8 +216,6 @@ export default function CrmHome() {
   const handleNewConsultationSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!completedCustomer) return;
-
-    // 기존 고객 정보를 기반으로 새로운 등록완료 고객 생성
     const newRegisteredCustomer = {
       ...initialForm,
       id: crypto.randomUUID(),
@@ -249,23 +230,15 @@ export default function CrmHome() {
       notificationStatus: '미발송',
       memo: form.memo,
     };
-
-    // 신규등록 고객 localStorage에 추가
     const existingRegisteredCustomers = JSON.parse(localStorage.getItem('registeredCustomers') || '[]');
     localStorage.setItem('registeredCustomers', JSON.stringify([...existingRegisteredCustomers, newRegisteredCustomer]));
-
-    // 폼 초기화 및 모달 닫기
     setForm(initialForm);
     setShowNewConsultationModal(false);
     setCompletedCustomer(null);
-
-    // 성공 알림 표시
     setNotification({ 
       message: `${completedCustomer.name} 고객이 신규등록 고객으로 등록되었습니다. 신규등록 고객 페이지로 이동합니다.`, 
       type: 'success' 
     });
-    
-    // 3초 후 알림 제거 및 페이지 이동
     setTimeout(() => {
       setNotification(null);
       router.push('/customers/registered');
@@ -276,66 +249,41 @@ export default function CrmHome() {
   const handleCompleteConsult = (id: string) => {
     const customer = customers.find(c => c.id === id);
     if (!customer) return;
-
     if (customer.registrationStatus === '미등록') {
-      // 미등록 고객: 상담완료로 변경하고 미등록 페이지에 업데이트
       const updatedCustomer = { ...customer, consultationStatus: '상담완료' };
-      
-      setCustomers(prev => prev.map(c => 
-        c.id === id ? updatedCustomer : c
-      ));
-      
-      // 상담고객 페이지 localStorage 업데이트
+      setCustomers(prev => prev.map(c => c.id === id ? updatedCustomer : c));
       const existingConsultationCustomers = JSON.parse(localStorage.getItem('consultationCustomers') || '[]');
       const updatedConsultationCustomers = existingConsultationCustomers.map((c: any) => 
         c.id === id ? updatedCustomer : c
       );
       localStorage.setItem('consultationCustomers', JSON.stringify(updatedConsultationCustomers));
-      
-      // 미등록 고객 localStorage에 추가
       const existingUnregisteredCustomers = JSON.parse(localStorage.getItem('unregisteredCustomers') || '[]');
       const customerExists = existingUnregisteredCustomers.some((c: any) => c.id === id);
-      
       if (!customerExists) {
         localStorage.setItem('unregisteredCustomers', JSON.stringify([...existingUnregisteredCustomers, updatedCustomer]));
       }
-      
-      // 알림 표시
       setNotification({ 
         message: `${customer.name} 고객의 상담이 완료되었습니다. 미등록 고객 페이지로 이동합니다.`, 
         type: 'success' 
       });
-      
-      // 3초 후 알림 제거 및 페이지 이동
       setTimeout(() => {
         setNotification(null);
         router.push('/customers/unregistered');
       }, 3000);
     } else {
-      // 등록완료 고객: 상담완료로 변경하고 신규상담 폼 표시
       const updatedCustomer = { ...customer, consultationStatus: '상담완료' };
-      setCustomers(prev => prev.map(c => 
-        c.id === id ? updatedCustomer : c
-      ));
-      
-      // 상담고객 페이지 localStorage 업데이트
+      setCustomers(prev => prev.map(c => c.id === id ? updatedCustomer : c));
       const existingConsultationCustomers = JSON.parse(localStorage.getItem('consultationCustomers') || '[]');
       const updatedConsultationCustomers = existingConsultationCustomers.map((c: any) => 
         c.id === id ? updatedCustomer : c
       );
       localStorage.setItem('consultationCustomers', JSON.stringify(updatedConsultationCustomers));
-      
-      // 완료된 고객 정보 저장하고 신규상담 폼 표시
       setCompletedCustomer(customer);
       setShowNewConsultationModal(true);
-      
-      // 알림 표시
       setNotification({ 
         message: `${customer.name} 고객의 상담이 완료되었습니다. 신규상담 폼이 열립니다.`, 
         type: 'success' 
       });
-      
-      // 3초 후 알림 제거
       setTimeout(() => {
         setNotification(null);
       }, 3000);
