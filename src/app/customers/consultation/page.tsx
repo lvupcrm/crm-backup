@@ -255,7 +255,7 @@ const ConsultationPage = () => {
     handleNotificationStatusChange(editingId || '', e.target.value);
   };
 
-  const filteredCustomers = customers.filter(customer => {
+  const filteredCustomers = customers.filter((customer: ConsultationCustomer) => {
     const consultationDate = parseISO(customer.consultationDate);
     return isSameDay(consultationDate, new Date(date));
   });
@@ -321,7 +321,7 @@ const ConsultationPage = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredCustomers.map((customer) => (
+            {filteredCustomers.map((customer: ConsultationCustomer) => (
               <tr key={customer.id}>
                 <td className="py-2 px-4 border-b">{customer.customerName}</td>
                 <td className="py-2 px-4 border-b">{customer.phoneNumber}</td>
