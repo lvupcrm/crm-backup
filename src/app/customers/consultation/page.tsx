@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle
@@ -13,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import './calendar-crm.css';
-import { format, isSameDay, parseISO, startOfWeek, endOfWeek, isWithinInterval, startOfMonth, endOfMonth } from 'date-fns';
+import { format, isSameDay, parseISO } from 'date-fns';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 const initialForm = {
@@ -77,10 +76,6 @@ const ConsultationPage = () => {
     const interval = setInterval(fetchCustomers, 60000); // Poll every minute
     return () => clearInterval(interval);
   }, [date]);
-
-  const handleSelectChange = (name: string) => (value: string) => {
-    setForm((prev: typeof initialForm) => ({ ...prev, [name]: value }));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -202,7 +197,7 @@ const ConsultationPage = () => {
     }
   };
 
-  const handleDateChange = (value: any) => {
+  const handleDateChange = (value: unknown) => {
     if (value instanceof Date) {
       setDate(format(value, 'yyyy-MM-dd'));
     }
