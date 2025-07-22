@@ -1,5 +1,7 @@
 import { User, Role, Branch, ConsultationCustomer, RegisteredCustomer, Product, Payment, MessageTemplate, Campaign, ScheduledMessage } from '@prisma/client'
 
+export type { ConsultationCustomer, RegisteredCustomer }
+
 export type UserWithRelations = User & {
   role: Role
   branch?: Branch | null

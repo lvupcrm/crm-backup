@@ -13,6 +13,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import ConsultationRecordPanel from '@/components/customers/ConsultationRecordPanel';
 
 interface ConsultationCustomer {
   id: string;
@@ -24,6 +25,7 @@ interface ConsultationCustomer {
   appointmentPurpose: string;
   consultationStatus: string;
   registrationStatus: string;
+  notificationStatus: string;
   memo?: string;
 }
 
@@ -36,6 +38,7 @@ const initialForm = {
   appointmentPurpose: '',
   consultationStatus: '미상담',
   registrationStatus: '미등록',
+  notificationStatus: '미발송',
   memo: '',
 };
 
@@ -44,6 +47,8 @@ export default function ConsultationCustomersPage() {
   const [form, setForm] = useState(initialForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [showConsultationRecord, setShowConsultationRecord] = useState(false);
+  const [selectedCustomerForRecord, setSelectedCustomerForRecord] = useState<ConsultationCustomer | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem('consultationCustomers');
@@ -94,8 +99,16 @@ export default function ConsultationCustomersPage() {
     }
   };
 
+  const handleConsultationRecord = (id: string) => {
+    const customer = customers.find(c => c.id === id);
+    if (customer) {
+      setSelectedCustomerForRecord(customer);
+      setShowConsultationRecord(true);
+    }
+  };
+
   return (
-    <div>
+    <div className={`transition-all duration-300 ${showConsultationRecord ? 'mr-1/2' : ''}`}>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">상담 고객 관리</h2>
         <Dialog open={open} onOpenChange={setOpen}>
@@ -158,13 +171,6 @@ export default function ConsultationCustomersPage() {
                   <option value="상담완료">상담완료</option>
                 </select>
               </div>
-              <div className="flex flex-col gap-1">
-                <Label htmlFor="registrationStatus">등록상태</Label>
-                <select id="registrationStatus" name="registrationStatus" value={form.registrationStatus} onChange={handleChange} className="border rounded p-2">
-                  <option value="미등록">미등록</option>
-                  <option value="등록완료">등록완료</option>
-                </select>
-              </div>
               <div className="flex flex-col gap-1 md:col-span-2">
                 <Label htmlFor="memo">메모</Label>
                 <Input id="memo" name="memo" placeholder="메모" value={form.memo} onChange={handleChange} />
@@ -187,8 +193,7 @@ export default function ConsultationCustomersPage() {
               <th className="p-2">종목</th>
               <th className="p-2">예약목적</th>
               <th className="p-2">상담상태</th>
-              <th className="p-2">등록상태</th>
-              <th className="p-2">메모</th>
+              <th className="p-2">상담기록</th>
               <th className="p-2">작업</th>
             </tr>
           </thead>
@@ -202,8 +207,16 @@ export default function ConsultationCustomersPage() {
                 <td className="p-2">{c.sport}</td>
                 <td className="p-2">{c.appointmentPurpose}</td>
                 <td className="p-2">{c.consultationStatus}</td>
-                <td className="p-2">{c.registrationStatus}</td>
-                <td className="p-2">{c.memo}</td>
+                <td className="p-2">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={() => handleConsultationRecord(c.id)}
+                    className="text-blue-600 hover:text-blue-700"
+                  >
+                    상담기록
+                  </Button>
+                </td>
                 <td className="p-2 space-x-2">
                   <Button size="sm" variant="outline" onClick={() => handleEdit(c.id)}>
                     수정
@@ -216,12 +229,24 @@ export default function ConsultationCustomersPage() {
             ))}
             {customers.length === 0 && (
               <tr>
-                <td colSpan={10} className="text-center p-4 text-gray-400">등록된 상담 고객이 없습니다.</td>
+                <td colSpan={9} className="text-center p-4 text-gray-400">등록된 상담 고객이 없습니다.</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
+
+      {/* 상담기록 사이드 패널 */}
+      {selectedCustomerForRecord && (
+        <ConsultationRecordPanel
+          customer={selectedCustomerForRecord}
+          isOpen={showConsultationRecord}
+          onClose={() => {
+            setShowConsultationRecord(false);
+            setSelectedCustomerForRecord(null);
+          }}
+        />
+      )}
     </div>
   );
 } 

@@ -34,8 +34,8 @@ apiClient.interceptors.response.use(
 
 export const api = {
   // Customers
-  getConsultationCustomers: (search?: string) =>
-    apiClient.get('/customers/consultation', { params: { search } }),
+  getConsultationCustomers: (params?: any) =>
+    apiClient.get('/customers/consultation', { params }),
   
   createConsultationCustomer: (customer: any) =>
     apiClient.post('/customers/consultation', customer),
