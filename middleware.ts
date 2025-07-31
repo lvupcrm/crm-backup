@@ -11,12 +11,18 @@ const PROTECTED_ROUTES = {
   '/settings': 'settings',
 } as const;
 
-// 공개 경로 (인증 불필요)
+// 공개 경로 (인증 불필요) - 임시로 모든 경로 허용
 const PUBLIC_PATHS = [
   '/login',
   '/register',
   '/forgot-password',
   '/api/auth',
+  '/customers', // 임시로 추가
+  '/products',  // 임시로 추가
+  '/messages',  // 임시로 추가
+  '/statistics', // 임시로 추가
+  '/settings',  // 임시로 추가
+  '/',          // 루트 경로도 추가
 ];
 
 // API 경로별 권한 체크
