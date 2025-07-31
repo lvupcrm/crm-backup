@@ -5,15 +5,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CustomerTable } from '@/components/customers/CustomerTable'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Calendar, Search, Plus } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
-import { apiClient } from '@/lib/api/client'
+import { format, subDays } from 'date-fns'
 import { ConsultationCustomer } from '@prisma/client'
-import { format, subDays, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns'
-import { ko } from 'date-fns/locale'
-import { X } from 'lucide-react'
 
 export default function ConsultationCustomersPage() {
   const [searchParams, setSearchParams] = useState({
@@ -23,8 +19,6 @@ export default function ConsultationCustomersPage() {
     searchTerm: ''
   })
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-  const [selectedCustomer, setSelectedCustomer] = useState<any>(null)
-  const [showDetailPanel, setShowDetailPanel] = useState(false)
   const [form, setForm] = useState({
     name: '',
     phone: '',
@@ -52,7 +46,7 @@ export default function ConsultationCustomersPage() {
         
         // 날짜 필터링
         if (searchParams.startDate && searchParams.endDate) {
-          filteredCustomers = filteredCustomers.filter((customer: any) => {
+          filteredCustomers = filteredCustomers.filter((customer: ConsultationCustomer) => {
             const appointmentDate = new Date(customer.appointmentDate);
             const startDate = new Date(searchParams.startDate);
             const endDate = new Date(searchParams.endDate);
@@ -62,7 +56,7 @@ export default function ConsultationCustomersPage() {
         
         // 담당자 필터링
         if (searchParams.staff && searchParams.staff !== 'all') {
-          filteredCustomers = filteredCustomers.filter((customer: any) => 
+          filteredCustomers = filteredCustomers.filter((customer: ConsultationCustomer) => 
             customer.managerId === searchParams.staff
           );
         }
@@ -70,7 +64,7 @@ export default function ConsultationCustomersPage() {
         // 텍스트 검색
         if (searchParams.searchTerm) {
           const searchLower = searchParams.searchTerm.toLowerCase();
-          filteredCustomers = filteredCustomers.filter((customer: any) =>
+          filteredCustomers = filteredCustomers.filter((customer: ConsultationCustomer) =>
             customer.name?.toLowerCase().includes(searchLower) ||
             customer.phone?.includes(searchParams.searchTerm) ||
             customer.memo?.toLowerCase().includes(searchLower)
@@ -83,17 +77,6 @@ export default function ConsultationCustomersPage() {
     },
   })
 
-  const createMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const { apiClient } = await import("@/lib/api/client");
-      const response = await apiClient.post('/customers/consultation', data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['consultation-customers'] })
-      setIsCreateModalOpen(false)
-    },
-  })
 
   const handleDateRangeChange = (type: 'all' | 'today' | 'yesterday' | 'thisWeek' | 'thisMonth' | 'lastMonth') => {
     const today = new Date()
@@ -194,7 +177,7 @@ export default function ConsultationCustomersPage() {
             value="all" 
             onChange={(e) => {
               const filter = e.target.value;
-              handleDateRangeChange(filter as any);
+              handleDateRangeChange(filter as 'all' | 'today' | 'yesterday' | 'thisWeek' | 'thisMonth' | 'lastMonth');
             }}
             className="border border-gray-300 rounded bg-gray-100 text-gray-900 h-10 px-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
           >

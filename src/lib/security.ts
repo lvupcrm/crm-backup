@@ -111,9 +111,9 @@ export class InputValidator {
   static checkPathTraversal(input: string): boolean {
     const pathPatterns = [
       /\.\.\//,
-      /\.\.\\\\,
+      /\.\.\\\\/,
       /%2e%2e%2f/i,
-      /%2e%2e\\\/i,
+      /%2e%2e%5c/i,
       /\.\.%2f/i,
       /\.\.%5c/i,
     ];

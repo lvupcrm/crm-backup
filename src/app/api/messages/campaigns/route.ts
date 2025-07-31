@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const isActive = searchParams.get('isActive');
 
-    const where: any = {};
+    const where: Record<string, unknown> = {};
     if (isActive !== null) where.isActive = isActive === 'true';
 
     const campaigns = await prisma.campaign.findMany({

@@ -12,8 +12,6 @@ const productSchema = z.object({
   isActive: z.boolean().default(true),
 });
 
-const updateProductSchema = productSchema.partial();
-
 // GET: 상품 목록 조회
 export async function GET(request: NextRequest) {
   try {
@@ -26,7 +24,7 @@ export async function GET(request: NextRequest) {
 
     const skip = (page - 1) * limit;
 
-    let where: any = {};
+    const where: Record<string, unknown> = {};
 
     if (search) {
       where.OR = [
