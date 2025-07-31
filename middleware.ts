@@ -62,6 +62,11 @@ function hasPermission(permissions: any, resource: string, action: string = 'vie
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
+  // 루트 경로는 완전히 공개 - 토큰 체크 없이 바로 통과
+  if (pathname === '/') {
+    return NextResponse.next();
+  }
+  
   // 공개 경로는 그대로 통과
   if (isPublicPath(pathname)) {
     const token = await getToken({ req: request });
