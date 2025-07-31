@@ -1,13 +1,35 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  eslint: {
-    // TEMP: Vercel 배포를 위해 ESLint 오류 무시 (추후 코드 품질 개선 후 제거 예정)
-    ignoreDuringBuilds: true,
+  experimental: {
+    // 성능 최적화
+    optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
   },
-  typescript: {
-    // TEMP: Vercel 배포를 위해 TypeScript 오류 무시 (추후 타입 오류 수정 후 제거 예정)
-    ignoreBuildErrors: true,
+  images: {
+    // 이미지 최적화 설정
+    formats: ["image/webp", "image/avif"],
+  },
+  // 보안 헤더 추가
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "X-Frame-Options", 
+            value: "DENY",
+          },
+          {
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
+          },
+        ],
+      },
+    ];
   },
 };
 

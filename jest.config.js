@@ -10,10 +10,6 @@ const customJestConfig = {
   // 테스트 환경 설정
   testEnvironment: 'jsdom',
   
-  // 모듈 경로 매핑 (tsconfig.json의 paths와 일치)
-  moduleNameMapping: {
-    '^@/(.*)$': '<rootDir>/src/$1',
-  },
   
   // 테스트 파일 패턴
   testMatch: [
