@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useMutation } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
@@ -396,7 +396,7 @@ function TemplateTypeSelector({ value, onChange, types }: { value: string; onCha
   );
 }
 
-export default function CreateTemplatePage() {
+function CreateTemplatePageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [channelTab, setChannelTab] = useState<'alimtalk' | 'friendtalk'>('alimtalk');
@@ -485,7 +485,10 @@ export default function CreateTemplatePage() {
   const uniqueVariables = [...new Set(variables)];
 
   const createMutation = useMutation({
-    mutationFn: (data: any) => api.createTemplate(data),
+    mutationFn: async (data: any) => {
+      const response = await apiClient.post('/messages/templates', data);
+      return response;
+    },
     onSuccess: () => {
       router.push('/messages/templates')
     },
@@ -1421,5 +1424,13 @@ export default function CreateTemplatePage() {
         </DialogContent>
       </Dialog>
     </div>
+  )
+}
+
+export default function CreateTemplatePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CreateTemplatePageContent />
+    </Suspense>
   )
 }

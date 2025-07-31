@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ type TemplateRequest = {
   fromExample?: boolean;
 };
 
-export default function TemplateRequestsPage() {
+function TemplateRequestsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
@@ -71,7 +71,12 @@ export default function TemplateRequestsPage() {
   // 모든 템플릿 불러오기
   const { data: templates, isLoading, isError } = useQuery({
     queryKey: ["templates-all"],
-    queryFn: () => import("@/lib/api/client").then((m) => m.api.getTemplates()).then((res: any) => res.data),
+    queryFn: async () => {
+      const { apiClient } = await import("@/lib/api/client");
+      const response = await apiClient.get('/messages/templates');
+      return response.data;
+    },
+    initialData: [],
   });
 
   const filteredTemplates = useMemo(() => {
@@ -206,5 +211,13 @@ export default function TemplateRequestsPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function TemplateRequestsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TemplateRequestsPageContent />
+    </Suspense>
   );
 } 

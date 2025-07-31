@@ -84,8 +84,11 @@ export default function ConsultationCustomersPage() {
   })
 
   const createMutation = useMutation({
-    mutationFn: (data: any) => 
-      api.createConsultationCustomer(data),
+    mutationFn: async (data: any) => {
+      const { apiClient } = await import("@/lib/api/client");
+      const response = await apiClient.post('/customers/consultation', data);
+      return response.data;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['consultation-customers'] })
       setIsCreateModalOpen(false)

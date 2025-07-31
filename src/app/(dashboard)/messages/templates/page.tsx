@@ -151,15 +151,21 @@ export default function TemplateListPage() {
   // Fetch templates
   const { data: templates, isLoading, isError } = useQuery({
     queryKey: ["templates"],
-    queryFn: () =>
-      // api.getTemplates() should return { data: Template[] }
-      import("@/lib/api/client").then((m) => m.api.getTemplates()).then((res: any) => res.data),
+    queryFn: async () => {
+      const { apiClient } = await import("@/lib/api/client");
+      const response = await apiClient.get('/messages/templates');
+      return response.data;
+    },
+    initialData: [],
   });
 
   // Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: (id: string) =>
-      import("@/lib/api/client").then((m) => m.api.deleteTemplate(id)),
+    mutationFn: async (id: string) => {
+      const { apiClient } = await import("@/lib/api/client");
+      const response = await apiClient.delete(`/messages/templates/${id}`);
+      return response.data;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["templates"] });
       setDeleteId(null);

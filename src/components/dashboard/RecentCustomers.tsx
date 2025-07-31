@@ -7,7 +7,11 @@ import { apiClient } from '@/lib/api/client'
 export function RecentCustomers() {
   const { data: customers } = useQuery({
     queryKey: ['recent-customers'],
-    queryFn: api.getRecentRegisteredCustomers,
+    queryFn: async () => {
+      const response = await apiClient.get('/customers/recent');
+      return response.data;
+    },
+    initialData: [],
   })
 
   return (

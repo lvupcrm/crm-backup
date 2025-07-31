@@ -30,20 +30,36 @@ export default function ProductsPage() {
   // Fetch products
   const { data: products, isLoading } = useQuery({
     queryKey: ["products"],
-    queryFn: () => import("@/lib/api/client").then((m) => m.api.getProducts()).then((res) => res.data),
+    queryFn: async () => {
+      const { apiClient } = await import("@/lib/api/client");
+      const response = await apiClient.get('/products');
+      return response.data;
+    },
+    initialData: [],
   });
   // Fetch payments
   const { data: payments } = useQuery({
     queryKey: ["payments"],
-    queryFn: () => import("@/lib/api/client").then((m) => m.api.getPayments()).then((res) => res.data),
+    queryFn: async () => {
+      const { apiClient } = await import("@/lib/api/client");
+      const response = await apiClient.get('/payments');
+      return response.data;
+    },
+    initialData: [],
   });
 
   // Add/Edit product
   const mutation = useMutation({
-    mutationFn: (payload) =>
-      editProduct
-        ? import("@/lib/api/client").then((m) => m.api.updateProduct(editProduct.id, payload))
-        : import("@/lib/api/client").then((m) => m.api.createProduct(payload)),
+    mutationFn: async (payload) => {
+      const { apiClient } = await import("@/lib/api/client");
+      if (editProduct) {
+        const response = await apiClient.put(`/products/${editProduct.id}`, payload);
+        return response.data;
+      } else {
+        const response = await apiClient.post('/products', payload);
+        return response.data;
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       setModalOpen(false);
@@ -54,7 +70,11 @@ export default function ProductsPage() {
 
   // Toggle active status
   const toggleMutation = useMutation({
-    mutationFn: (p) => import("@/lib/api/client").then((m) => m.api.updateProduct(p.id, { ...p, isActive: !p.isActive })),
+    mutationFn: async (p) => {
+      const { apiClient } = await import("@/lib/api/client");
+      const response = await apiClient.put(`/products/${p.id}`, { ...p, isActive: !p.isActive });
+      return response.data;
+    },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["products"] }),
   });
 
