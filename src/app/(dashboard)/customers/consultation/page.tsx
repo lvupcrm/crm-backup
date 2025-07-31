@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar, Search, Plus } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
-import { api } from '@/lib/api/client'
+import { apiClient } from '@/lib/api/client'
 import { ConsultationCustomer } from '@prisma/client'
 import { format, subDays, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns'
 import { ko } from 'date-fns/locale'

@@ -2,7 +2,7 @@
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { useQuery } from '@tanstack/react-query'
-import { api } from '@/lib/api/client'
+import { apiClient } from '@/lib/api/client'
 
 export function RecentCustomers() {
   const { data: customers } = useQuery({
