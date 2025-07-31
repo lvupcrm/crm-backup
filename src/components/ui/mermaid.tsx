@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import DOMPurify from 'dompurify';
 
 interface MermaidProps {
   chart: string;
@@ -15,7 +16,15 @@ const Mermaid: React.FC<MermaidProps> = ({ chart }) => {
       mermaid.initialize({ startOnLoad: false });
       if (ref.current) {
         mermaid.render(renderId, chart).then(({ svg }: { svg: string }) => {
-          if (ref.current) ref.current.innerHTML = svg;
+          if (ref.current) {
+            // XSS 보호를 위한 SVG 콘텐츠 정화
+            const sanitizedSvg = DOMPurify.sanitize(svg, {
+              USE_PROFILES: { svg: true, svgFilters: true },
+              ADD_TAGS: ['foreignObject'],
+              ADD_ATTR: ['xmlns']
+            });
+            ref.current.innerHTML = sanitizedSvg;
+          }
         });
       }
     });

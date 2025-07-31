@@ -42,8 +42,13 @@ const authOptions: AuthOptions = {
             return null
           }
 
-          // 로그인 성공 로그
-          console.log(`User logged in: ${user.email} (${user.id})`);
+          // 로그인 성공 로그 (보안 강화)
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`User logged in: ${user.email} (${user.id})`);
+          } else {
+            // 프로덕션에서는 민감정보 마스킹
+            console.log(`User logged in: ${user.email.replace(/(.{2}).*(@.*)/, '$1***$2')} (ID: ${user.id.substring(0, 8)}...)`);
+          }
 
           return {
             id: user.id,
@@ -56,9 +61,14 @@ const authOptions: AuthOptions = {
           }
         } catch (error) {
           if (error instanceof ZodError) {
-            console.error('Invalid credentials format:', error.errors);
+            // 보안 강화: 자세한 에러 정보는 개발 환경에서만 노출
+            if (process.env.NODE_ENV === 'development') {
+              console.error('Invalid credentials format:', error.errors);
+            } else {
+              console.error('Invalid credentials format');
+            }
           } else {
-            console.error('Login error:', error);
+            console.error('Login error:', process.env.NODE_ENV === 'development' ? error : 'Authentication failed');
           }
           return null
         }
@@ -120,10 +130,16 @@ const authOptions: AuthOptions = {
   },
   events: {
     async signIn({ user, account, profile, isNewUser }) {
-      console.log(`Sign in event: ${user.email}`);
+      // 보안 강화: 이벤트 로깅
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`Sign in event: ${user.email}`);
+      }
     },
     async signOut({ session, token }) {
-      console.log(`Sign out event: ${token?.email || 'unknown'}`);
+      // 보안 강화: 이벤트 로깅
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`Sign out event: ${token?.email || 'unknown'}`);
+      }
     },
   },
   debug: process.env.NODE_ENV === 'development',
