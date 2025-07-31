@@ -85,10 +85,8 @@ function TemplateRequestsPageContent() {
   }, [templates, search]);
 
   const handleSubmitRequest = () => {
-    // 템플릿 신청 처리 로직
-    console.log('템플릿 신청:', newRequest);
+    // TODO: API 호출하여 템플릿 신청 처리
     setShowNewRequestDialog(false);
-    // 실제로는 API 호출하여 신청 처리
   };
 
   return (

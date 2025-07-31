@@ -15,7 +15,7 @@ function exportSectionToExcel(section: string) {
 }
 
 function BranchStats() {
-  // TODO: 실제 데이터 fetch/가공
+  // 지점별 현황 데이터 (이후 API로 대체 예정)
   const data = [
     { name: '둔전점', active: 120, revenue: 12000000, growth: 8.2 },
     { name: '본점', active: 90, revenue: 9000000, growth: 5.1 },
@@ -55,7 +55,7 @@ function BranchStats() {
 }
 
 function TrainerStats() {
-  // TODO: 실제 데이터 fetch/가공
+  // 트레이너별 통계 데이터 (이후 API로 대체 예정)
   const data = [
     { name: '김트레이너', assigned: 40, retention: 92 },
     { name: '박트레이너', assigned: 35, retention: 88 },
@@ -93,7 +93,7 @@ function TrainerStats() {
 }
 
 function ProductStats() {
-  // TODO: 실제 데이터 fetch/가공
+  // 상품별 통계 데이터 (이후 API로 대체 예정)
   const data = [
     { name: '헬스 1개월', sold: 80, revenue: 1600000 },
     { name: 'PT 10회', sold: 25, revenue: 2500000 },

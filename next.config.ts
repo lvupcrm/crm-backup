@@ -2,11 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   eslint: {
-    // 빌드 시 ESLint 오류 무시 (프로덕션 배포를 위한 임시 설정)
+    // TEMP: Vercel 배포를 위해 ESLint 오류 무시 (추후 코드 품질 개선 후 제거 예정)
     ignoreDuringBuilds: true,
   },
   typescript: {
-    // 빌드 시 TypeScript 오류 무시 (프로덕션 배포를 위한 임시 설정) 
+    // TEMP: Vercel 배포를 위해 TypeScript 오류 무시 (추후 타입 오류 수정 후 제거 예정)
     ignoreBuildErrors: true,
   },
 };

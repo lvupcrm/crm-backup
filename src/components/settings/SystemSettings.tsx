@@ -20,7 +20,7 @@ export function SystemSettings() {
 
   const handleSave = () => {
     // 설정 저장 로직
-    console.log('설정 저장:', settings)
+    // TODO: API 호출하여 설정 저장
   }
 
   return (

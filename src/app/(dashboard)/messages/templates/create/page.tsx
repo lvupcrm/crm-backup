@@ -1272,8 +1272,7 @@ function CreateTemplatePageContent() {
                 type="button"
                 variant="outline"
                 onClick={() => {
-                  // 임시저장 로직 구현
-                  console.log('임시저장 기능');
+                  // TODO: 임시저장 로직 구현
                 }}
               >
                 임시저장
