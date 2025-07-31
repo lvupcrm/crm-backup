@@ -9,7 +9,15 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 5 * 60 * 1000, // 5분
+        retry: 1,
+      },
+    },
+  }));
+  
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex min-h-screen bg-gray-50">
@@ -17,7 +25,7 @@ export default function DashboardLayout({
         <div className="flex-1 flex flex-col overflow-hidden">
           <Header />
           <main className="flex-1 overflow-x-hidden bg-gray-50">
-            <div className="w-full mx-auto px-6 py-0">
+            <div className="w-full mx-auto px-6 py-4">
               {children}
             </div>
           </main>

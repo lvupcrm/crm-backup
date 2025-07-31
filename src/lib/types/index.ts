@@ -64,56 +64,21 @@ export interface ChartData {
   value: number
 }
 
-// Form Types
-export interface CustomerFormData {
-  name: string
-  phone: string
-  email?: string
-  memo?: string
-}
-
-export interface ConsultationFormData extends CustomerFormData {
-  appointmentDate: Date
-  inquiryChannel: string
-  sport: string
-  appointmentPurpose: string
-  consultationStatus: string
-  registrationStatus: string
-}
-
-export interface RegisteredCustomerFormData extends CustomerFormData {
-  joinDate: Date
-  membershipType: string
-  membershipExpiry: Date
-  trainerId?: string
-  branchId: string
-  status: string
-}
-
-export interface ProductFormData {
-  productName: string
-  description?: string
-  price: number
-  validityPeriod: number
-  branchId?: string
-  isActive: boolean
-}
-
-export interface MessageTemplateFormData {
-  templateName: string
-  channel: string
-  templateCode?: string
-  content: string
-  variables: string[]
-}
-
-export interface CampaignFormData {
-  campaignName: string
-  description?: string
-  sendCondition: string
-  templateId: string
-  isActive: boolean
-}
+// Re-export form types from schemas for consistency
+export type {
+  ConsultationCustomerFormData,
+  RegisteredCustomerFormData,
+  ProductFormData,
+  MessageTemplateFormData,
+  CampaignFormData,
+  ScheduledMessageFormData,
+  PaymentFormData,
+  UserFormData,
+  UpdateUserFormData,
+  LoginFormData,
+  BranchFormData,
+  RoleFormData,
+} from '@/lib/schemas';
 
 // Permission Types
 export interface UserPermissions {
